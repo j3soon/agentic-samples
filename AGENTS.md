@@ -1,5 +1,11 @@
 # Repository Guidelines
 
+## Writing Rules
+
+Avoid semicolons and spaced dashes in prose, including documentation, comments,
+and agent responses. Use periods, commas, or parentheses instead. This rule
+does not apply to code syntax, command options, or Markdown list markers.
+
 ## Commit Rules
 
 - End agent-created commit bodies with a plain `by <Harness> (<Model>)` line
