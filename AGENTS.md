@@ -1,5 +1,23 @@
 # Repository Guidelines
 
+## Design and Documentation
+
+- This is an educational repository. Follow Pi's philosophy of small, explicit
+  tools. Prioritize readability, simplicity, maintainability, and ease of use.
+- Keep scripts minimal and readable for teaching. Show underlying commands and
+  explain non-obvious steps. Keep only checks that prevent real mistakes.
+  Put remote workloads in separate scripts. Share repetitive setup in small,
+  readable helpers, keeping each script's main commands visible. Hardcode
+  example defaults when clearer.
+- Minimize dependencies and avoid requiring harness plugins. Support both agent
+  workflows and concise manual steps.
+- Keep README focused on prompts, commands, and links. Put details in `docs/`,
+  ending guides with a link to the next README section.
+- Match configuration names to the service GUI. Check model availability there
+  and validate the documented workflow before claiming it works.
+- Test documented commands. Keep detailed validation notes in ignored
+  `artifacts/validation/<timestamp>.md`, and omit validation dates from guides.
+
 ## Writing Rules
 
 Avoid semicolons and spaced dashes in prose, including documentation, comments,

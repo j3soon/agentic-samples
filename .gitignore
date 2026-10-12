@@ -2,3 +2,4 @@ secrets/*
 !secrets/.env.example
 *.sif
 results/
+/artifacts
