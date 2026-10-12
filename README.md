@@ -21,6 +21,34 @@ You may give a rotatable RAP API key to the agent. The agent prompts you with th
 Each example also includes concise steps you can follow manually using the same
 scripts.
 
+## 1. Set up a local agent and RAP
+
+If you already have a Codex or Claude Code subscription, use that agent to help
+with setup. Otherwise, [install or update OpenCode](https://opencode.ai/docs/) and start it
+from this repository:
+
+```bash
+opencode --auto
+```
+
+Use its default free model, or select an available free model with `/models`.
+Some [OpenCode free models](https://opencode.ai/docs/zen/#privacy) may use your
+prompts and code for training or product improvement. Use them for this public
+setup, then switch to your team's RAP endpoint for event work. RAP's
+[data-protection guidance](https://rap-docs.genai.nchc.org.tw/docs/service_intro/home/#%E7%94%A8%E6%88%B6%E8%B3%87%E6%96%99%E4%BF%9D%E8%AD%B7)
+says retained operational records are not used for model training and are deleted
+after six months.
+
+Get your team's pre-created RAP API key from your mentor in your team Slack
+channel. Ask your agent:
+
+> Configure RAP with Kimi-K3 for OpenCode, then test image reading.
+
+Continue with **RAP + Kimi-K3** for the remaining setup. Use RAP freely during
+the hackathon. The event quota is intended to be effectively unlimited for normal
+team use, though service rate limits still apply. Pi is the secondary option.
+See [docs/rap.md](docs/rap.md) for manual steps and privacy guidance.
+
 ## 2. Set up NCHC iService credentials
 
 With your local agent ready, follow
