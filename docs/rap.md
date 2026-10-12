@@ -3,7 +3,8 @@
 Use **RAP + Kimi-K3** with OpenCode by default. Pi is the secondary option for
 users who prefer a smaller, customizable harness. No harness plugin is needed.
 
-Choose an environment suitable for YOLO or all-permissions mode. Get your team's pre-created RAP API key from your mentor
+Choose an [agent environment](agent-environments.md) suitable for YOLO or
+all-permissions mode. Get your team's pre-created RAP API key from your mentor
 in your team Slack channel. See [credential setup](nchc-iservice.md#2-rap-api-key).
 
 Ask your agent:
@@ -16,7 +17,7 @@ client's local prompt. RAP does not require a Nano4 SSH connection.
 ## Start an agent for setup
 
 Use your existing Codex or Claude Code subscription to configure RAP if available.
-Otherwise,
+See [launch commands](agent-environments.md#launch-the-agent). Otherwise,
 [install the current OpenCode release](https://opencode.ai/docs/) and run
 `opencode --auto` from this repository. If already installed, use `opencode upgrade`
 first. The current free tier requires OpenCode 1.18.0 or newer. Use its default

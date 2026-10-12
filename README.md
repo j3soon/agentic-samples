@@ -21,6 +21,21 @@ You may give a rotatable RAP API key to the agent. The agent prompts you with th
 Each example also includes concise steps you can follow manually using the same
 scripts.
 
+## 0. Choose the agent environment
+
+Use Ubuntu, macOS, or Windows with WSL2, with Bash, OpenSSH, and rsync 3+.
+
+**Prerequisite:** use an environment where you can enable YOLO or all-permissions
+mode. A personal computer is fine if you accept the agent's access to files and
+credentials. Containers, dedicated VMs, and Nano4 compute allocations are also
+options.
+
+Use OpenCode by default, with Pi as the secondary option for users who prefer
+minimalism and customizability. Approval prompts suit sensitive environments
+but make this workflow much less efficient.
+See [docs/agent-environments.md](docs/agent-environments.md) for launch commands.
+Keep persistent agents off cluster login nodes.
+
 ## 1. Set up a local agent and RAP
 
 If you already have a Codex or Claude Code subscription, use that agent to help

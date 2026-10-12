@@ -21,6 +21,19 @@
 - Test documented commands. Keep detailed validation notes in ignored
   `artifacts/validation/<timestamp>.md`, and omit validation dates from guides.
 
+## Agent Environments
+
+- Require an environment suitable for YOLO or all-permissions mode. Personal
+  computers are allowed when users accept access to files and credentials.
+- Default to OpenCode, with Pi as the minimal, customizable secondary option.
+  Document only YOLO launch commands. Briefly note that approvals slow the workflow.
+- When `/.dockerenv` exists, assume the container is safely isolated.
+  Never change harness permission settings automatically.
+- Treat Nano4 as non-sensitive. Ask returning users to back up existing files
+  before initial agent setup. New users can skip this step.
+- Run persistent cluster agents in Slurm allocations, not on login nodes.
+  Use direct Slurm commands when already on Nano4. See `docs/agent-environments.md`.
+
 ## Writing Rules
 
 Avoid semicolons and spaced dashes in prose, including documentation, comments,

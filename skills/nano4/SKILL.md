@@ -17,6 +17,11 @@ in the user's own terminal. Rsync reuses the authenticated SSH master.
   to keep. New users can skip this step. Treat Nano4 as non-sensitive, with
   OpenCode as the default agent. YOLO or all-permissions mode is a prerequisite.
   The user chooses the mode, and scripts do not change permissions automatically.
+- For a cluster-hosted agent, follow `docs/agent-environments.md`. Run the agent
+  in a Slurm allocation. A long-running H200 agent uses `8gpus` with one GPU,
+  two CPU cores, and 8 GB RAM, for up to 48 hours. Choose workload partitions
+  using the limits and current load below. Use direct Slurm commands from
+  compute nodes rather than adding an SSH hop, and submit workloads with `sbatch`.
 - Handle setup and jobs with the standalone scripts. When the user must change account
   website settings or run a command manually, explain why and give the exact
   steps or command. Resume after they confirm completion. Never ask them to
@@ -52,3 +57,44 @@ in the user's own terminal. Rsync reuses the authenticated SSH master.
   syntax. `logout.sh` closes the shared connection. Otherwise it has no local
   idle expiration, but the server, network, or local machine may disconnect it.
   Submit only jobs within the user's requested scope.
+
+## Choose a partition
+
+Check the [Nano4 partition guide](https://man.twcc.ai/@nano4-manual/SJM_FuxDWe)
+and live Slurm settings before planning resources. The published limits are:
+
+| Partition | Hardware | Minimum GPUs | Maximum hours | GPUs per account | Running/pending jobs per user | Hackathon access |
+|---|---|---:|---:|---:|---:|---|
+| `dev` | H200 (x86_64) | 1 | 4 | 32 | 10/10 | Yes |
+| `8gpus` | H200 (x86_64) | 1 | 48 | 32 | 8/10 | Yes |
+| `16gpus` | H200 (x86_64) | 8 | 48 | 32 | 6/8 | Yes |
+| `32gpus` | H200 (x86_64) | 16 | 24 | 32 | 4/6 | Yes |
+| `64gpus` | H200 (x86_64) | 32 | 24 | 64 | 2/4 | Yes |
+| `gb200-dev` | GB200 (aarch64) | 1 | 2 | 2 | 2/2 | Yes |
+| `gb200-r1` | GB200 (aarch64) | 16 | 24 | 32 | 2/2 | No |
+| `gb200-r2` | GB200 (aarch64) | 32 | 12 | 72 | 1/2 | No |
+
+Hackathon access was checked with `sbatch --test-only` using the test project.
+All six accessible partitions accepted requests at their maximum runtimes.
+`gb200-r1`, `gb200-r2`, and all other visible partitions rejected the project,
+including CPU-only partitions. Dry-runs check scheduler acceptance without
+allocating resources. Recheck access if the project or cluster policy changes.
+
+H200 allows at most 12 CPU cores and 200 GB RAM per GPU. GB200 requires ARM
+binaries and images. Prepare them on `gb200-dev`, not an x86_64 login node.
+The GB200 production partitions keep jobs within one rack.
+
+- Use H200 for this hackathon. Use GB200 only when the user explicitly requests it.
+- Filter partitions by account/QoS access, GPU count, architecture, runtime,
+  and remaining account and user limits. Do not infer limits from partition names.
+- Take one load snapshot with `sinfo -s` and `squeue`, and inspect
+  `scontrol show partition`. For GPU capacity, compare `CfgTRES` and `AllocTRES`
+  in `scontrol show nodes`. Mixed nodes can still have GPUs available.
+- Among compatible partitions, prefer the shortest expected wait. If unclear,
+  use `sbatch --test-only` with the actual account, resources, and time limit for
+  the candidate partitions. Estimates can change and do not guarantee a start.
+- Prefer `dev` for short H200 setup and tests when its wait is suitable.
+  A one-GPU H200 agent needing more than four hours uses `8gpus`. Do not request
+  extra GPUs or shorten the required runtime just to enter a less busy queue.
+- Pass the chosen partition and resources through the scripts' Slurm options.
+  Explain the choice briefly. Avoid frequent scheduler polling.

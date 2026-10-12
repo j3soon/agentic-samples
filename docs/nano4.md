@@ -37,7 +37,8 @@ Preparation uploads `remote/prepare-sif.sh` and runs it through Slurm.
 
 ## Agent workflow
 
-Choose a host that supports YOLO or all-permissions mode. Run a
+Choose a host that supports YOLO or all-permissions mode using
+[agent-environments.md](agent-environments.md). Run a
 persistent cluster-hosted agent in a Slurm allocation. On a compute node, use
 Slurm commands directly. The SSH scripts below are for an agent outside Nano4.
 
@@ -131,6 +132,15 @@ container URI and choose its SIF filename. For example:
 ```bash
 bash scripts/nano4/prepare-sif.sh docker://ubuntu:24.04 ubuntu.sif
 ```
+
+This hackathon focuses on H200. Use GB200 only when explicitly requested.
+
+Hackathon projects can use `dev`, `8gpus`, `16gpus`, `32gpus`, `64gpus`,
+and `gb200-dev`. Slurm dry-runs accepted all six at their maximum runtimes.
+Other visible partitions, including `gb200-r1`, `gb200-r2`, and CPU-only
+partitions, rejected the test project. See the
+[partition table](../skills/nano4/SKILL.md#choose-a-partition) for limits
+and selection guidance. GB200 needs ARM images and binaries.
 
 Preparation defaults to one H200 GPU allocation, 12 CPU cores, and 200G RAM
 in `dev` for up to four hours, its maximum job time. These CPU and memory
