@@ -1,49 +1,34 @@
 # Agentic Samples
 
-Practical examples for getting work done through coding agents such as Codex,
-Claude Code, OpenCode, and Pi. The aim is to let agents handle as much setup,
+[![Slack](https://img.shields.io/badge/Slack-4A154B?logo=slack&logoColor=white)](https://app.slack.com/client/T0C70DGFW02)
+[![Cluster support](https://img.shields.io/badge/%23cluster--support-green)](https://nchcopenhackathon2026.slack.com/archives/C0C749A0NTE)
+
+Examples for the [NCHC Open Hackathon](https://www.openhackathons.org/s/siteevent/a0CUP00004AB2oc2AD/se000481).
+Each team has an NVIDIA mentor for domain-specific questions. Your mentor shares
+the team's pre-created RAP API key in your team Slack channel. For Nano4 access
+or RAP key issues, ask [#cluster-support](https://nchcopenhackathon2026.slack.com/archives/C0C749A0NTE).
+
+Practical examples for getting work done through coding agents such as
+[Codex](https://openai.com/codex/), [Claude Code](https://code.claude.com/docs/en/overview),
+[OpenCode](https://opencode.ai/), and [Pi](https://pi.dev/). The aim is to let
+agents handle as much setup,
 execution, and result collection as possible using plain scripts and skills,
 without additional harness plugins.
 
 The workflow keeps passwords and MFA codes out of LLM chat by default for better
-security. Account website settings and authentication stay in your hands. The
-agent prompts you with the steps or commands when needed, then resumes the work.
+security. Account website settings and Nano4 authentication stay in your hands.
+You may give a rotatable RAP API key to the agent. The agent prompts you with the steps or commands when needed, then resumes the work.
 Each example also includes concise steps you can follow manually using the same
 scripts.
 
-## 1. Set up NCHC iService credentials
+## 2. Set up NCHC iService credentials
 
-Complete these steps yourself before starting the agent workflow. Sign in to
-[NCHC iService](https://iservice.nchc.org.tw/nchc_service/index.php) and open
-**Member Center → Member Profile → System Account (會員中心 → 會員資訊 → 主機帳號資訊)**:
+With your local agent ready, follow
+[docs/nchc-iservice.md](docs/nchc-iservice.md#1-nano4-ssh-credentials) for Nano4
+SSH credentials and project access. The agent can guide you, but website settings,
+machine passwords, and OTP entry stay in your hands.
 
-1. Set up your **Supercomputer account (主機帳號)** for Nano4.
-2. Set your **Supercomputer password (主機密碼)** for SSH login.
-3. Create an **OTP Token** using **create user otp (建立OTP載具)**. Follow the registration email
-   to set up the authentication app on your phone.
-
-See the [NCHC OTP setup guide](https://iservice.nchc.org.tw/nchc_service/nchc_service_qa_single.php?qa_code=774)
-for phone registration and login instructions, and the
-[Nano4 login setup](https://man.twcc.ai/@nano4-manual/rydOv6-Dbl) for account and
-password setup. Keep your password, OTP registration details, and codes private.
-
-Have these two identifiers ready for the agent or manual setup:
-
-- `NCHC_ISERVICE_HOST_ACCOUNT`: your approved Supercomputer account username,
-  shown under Host Account Information. This is your SSH username.
-- `NCHC_ISERVICE_PROJECT_ID`: the iService Project ID for your Nano4-enabled
-  project. Find it in **Member Center → Projects → My Projects (會員中心 → 計畫管理 → 我的計畫)**.
-  Look up "NCHC-NVIDIA Joint Lab 教育訓練", the Project ID should be `GOV114072`.
-  Nano4's [job submission examples](https://man.twcc.ai/@nano4-manual/BkRXxZ_JMg)
-  use this ID for Slurm's `--account` option.
-
-If you do not yet have access to this project, contact your mentor for help.
-
-For either workflow, use **Linux, macOS, or Windows through WSL** with Bash,
-SSH, and tar, and connect from a permitted IP. Native Windows OpenSSH does not
-support the connection sharing used here. No local container runtime is needed.
-
-## 2. Start the agent workflow
+## 3. Run jobs on Nano4
 
 Start a local agent session in this repository and ask:
 
@@ -64,7 +49,7 @@ same WSL distribution. The agent can then reuse the SSH connection until it
 expires. Command runners without an interactive terminal, including Codex
 CLI's `!` runner, cannot perform this login step.
 
-## 3. Run manually (optional)
+### Run manually (optional)
 
 After completing the iService setup above, you can also run the same steps
 yourself. Run all helper commands locally from the repository root.
@@ -76,7 +61,7 @@ H200 GPU.
 ### 1. Configure access
 
 ```bash
-bash scripts/nano4.sh configure your_host_username your_project_id
+bash scripts/nano4.sh configure YOUR_SUPERCOMPUTER_ACCOUNT YOUR_PROJECT_SYSTEM_CODE
 bash scripts/nano4.sh login
 ```
 
@@ -131,14 +116,14 @@ directory returns the existing job ID to prevent accidental duplicate jobs.
 If submission is interrupted without a recorded ID, inspect Slurm before retrying.
 
 ```bash
-export NCHC_REMOTE_DIR=/work/your_host_username/my-next-run
+export NCHC_REMOTE_DIR=/work/YOUR_SUPERCOMPUTER_ACCOUNT/my-next-run
 ```
 
 Only scripts and selected results use the shared login connection. For large
 input or output transfers, Nano4's data-transfer service uses port 2222 and
 requires separate authentication. If a runtime needs a site module, load it in
 the preparation or job script. The helper uses the lowercase Slurm account form
-of your iService Project ID.
+of your iService Project system code.
 
 ### 3. Check and download results
 
@@ -166,13 +151,3 @@ bash scripts/nano4.sh logout        # Close the shared connection when finished.
 
 When authentication expires, run `login` again and resume. Check host driver
 compatibility before running actual PyTorch/CUDA workloads.
-
-Validated on Nano4 on 2026-10-08 with Apptainer 1.4.3: PyTorch and Ubuntu image preparation,
-H200 GPU visibility, custom job commands, and local log/artifact downloads.
-Both smoke tests completed with exit code `0:0`. PyTorch preparation took about
-nine minutes using cached OCI layers.
-
-References: [NGC PyTorch](https://catalog.ngc.nvidia.com/orgs/nvidia/containers/pytorch),
-[Nano4 manual](https://man.twcc.ai/@nano4-manual/SyaY-6T8bg),
-[partitions](https://man.twcc.ai/@nano4-manual/SJM_FuxDWe), and
-[file transfer](https://man.twcc.ai/@nano4-manual/Hkayr3zvWl).

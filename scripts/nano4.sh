@@ -29,9 +29,9 @@ if [[ "$command" == configure ]]; then
   }
   mkdir -p "$repo_dir/secrets"
   # Store only account identifiers, with permissions restricted to this user.
-  (umask 077; printf 'NCHC_ISERVICE_HOST_ACCOUNT=%s\nNCHC_ISERVICE_PROJECT_ID=%s\n' "$1" "$2" > "$config")
+  (umask 077; printf 'NCHC_ISERVICE_SUPERCOMPUTER_ACCOUNT=%s\nNCHC_ISERVICE_PROJECT_SYSTEM_CODE=%s\n' "$1" "$2" > "$config")
   chmod 600 "$config"
-  echo 'Saved username and project ID in secrets/.env.'
+  echo 'Saved username and project system code in secrets/.env.'
   exit 0
 fi
 
@@ -42,14 +42,14 @@ fi
 while IFS='=' read -r key value; do
   value=${value%$'\r'}
   case "$key" in
-    NCHC_ISERVICE_HOST_ACCOUNT) NCHC_ISERVICE_HOST_ACCOUNT=$value ;;
-    NCHC_ISERVICE_PROJECT_ID) NCHC_ISERVICE_PROJECT_ID=$value ;;
+    NCHC_ISERVICE_SUPERCOMPUTER_ACCOUNT) NCHC_ISERVICE_SUPERCOMPUTER_ACCOUNT=$value ;;
+    NCHC_ISERVICE_PROJECT_SYSTEM_CODE) NCHC_ISERVICE_PROJECT_SYSTEM_CODE=$value ;;
   esac
 done < "$config"
-[[ ${NCHC_ISERVICE_HOST_ACCOUNT:-} =~ ^[a-zA-Z0-9_-]+$ && ${NCHC_ISERVICE_PROJECT_ID:-} =~ ^[a-zA-Z0-9_-]+$ ]] || {
-  echo 'Configure a valid username and project ID first.' >&2; exit 2;
+[[ ${NCHC_ISERVICE_SUPERCOMPUTER_ACCOUNT:-} =~ ^[a-zA-Z0-9_-]+$ && ${NCHC_ISERVICE_PROJECT_SYSTEM_CODE:-} =~ ^[a-zA-Z0-9_-]+$ ]] || {
+  echo 'Configure a valid username and project system code first.' >&2; exit 2;
 }
-remote_dir=${NCHC_REMOTE_DIR:-/work/$NCHC_ISERVICE_HOST_ACCOUNT/agentic-samples}
+remote_dir=${NCHC_REMOTE_DIR:-/work/$NCHC_ISERVICE_SUPERCOMPUTER_ACCOUNT/agentic-samples}
 [[ "$remote_dir" == /* && "$remote_dir" != *$'\n'* ]] || { echo 'Remote directory must be absolute.' >&2; exit 2; }
 # A private control socket lets commands reuse one password/MFA authentication.
 # OpenSSH expands %C to a hash of the connection's host, user, and port details.
@@ -57,7 +57,7 @@ control_dir="$HOME/.ssh/nano4-control"
 mkdir -p "$control_dir"
 chmod 700 "$control_dir"
 ssh_options=(-p 22 -o "ControlPath=$control_dir/%C" -o ConnectTimeout=15)
-target="$NCHC_ISERVICE_HOST_ACCOUNT@nano4.nchc.org.tw"
+target="$NCHC_ISERVICE_SUPERCOMPUTER_ACCOUNT@nano4.nchc.org.tw"
 
 case "$command" in
   login)
@@ -104,7 +104,7 @@ if [[ "$command" == prepare ]]; then
   image_uri=$1
   image_name=$2
   shift 2
-  account=$(printf '%s' "$NCHC_ISERVICE_PROJECT_ID" | tr '[:upper:]' '[:lower:]')
+  account=$(printf '%s' "$NCHC_ISERVICE_PROJECT_SYSTEM_CODE" | tr '[:upper:]' '[:lower:]')
   printf -v remote_command 'mkdir -p %q && cat > %q' "$remote_dir" "$remote_dir/prepare.sh"
   ssh "${ssh_options[@]}" "$target" "$remote_command" < "$repo_dir/cluster/nano4/prepare.sh"
   # Build on an allocated compute node. Caller-supplied srun options follow
@@ -120,7 +120,7 @@ elif [[ "$command" == submit ]]; then
   # Transfer only this small job script through the existing login connection.
   printf -v remote_command 'mkdir -p %q && cat > %q' "$remote_dir" "$remote_dir/job.slurm"
   ssh "${ssh_options[@]}" "$target" "$remote_command" < "$job_script"
-  printf -v remote_command '%q ' bash -s -- "$remote_dir" "$NCHC_ISERVICE_PROJECT_ID" "$@"
+  printf -v remote_command '%q ' bash -s -- "$remote_dir" "$NCHC_ISERVICE_PROJECT_SYSTEM_CODE" "$@"
   # Quoted heredocs execute remotely without expanding local shell variables.
   ssh "${ssh_options[@]}" "$target" "$remote_command" <<'REMOTE'
 set -euo pipefail

@@ -14,7 +14,7 @@ Linux/macOS/WSL. Container preparation runs on Nano4 through Slurm.
   steps or command. Resume after they confirm completion. Never ask them to
   paste passwords or OTP codes into chat. Use their own terminal for login.
 - If `secrets/.env` is missing or incomplete, ask for the host username and
-  iService Project ID, then run `configure USER PROJECT`. Keep passwords and
+  iService Project system code, then run `configure USER PROJECT`. Keep passwords and
   OTP codes out of chat and files.
 - Run `check`. When authentication is needed, ask the user to run
   `bash scripts/nano4.sh login` in a separate interactive terminal under the
