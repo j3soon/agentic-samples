@@ -58,124 +58,21 @@ machine passwords, and OTP entry stay in your hands.
 
 ## 3. Run jobs on Nano4
 
-Start a local agent session in this repository and ask:
+If you have used Nano4 before, back up existing files you want to keep first.
+New users can skip this step. See [docs/nano4.md](docs/nano4.md).
 
-> Submit the Nano4 container smoke test.
+Ask your agent:
 
-Skills are stored in `skills/` and linked from `.agents/skills` and
-`.claude/skills` for automatic discovery. You do not need to name a skill in
-your request when your agent discovers it.
+> Submit the Nano4 container smoke test and download its logs.
 
-The agent configures access, prepares the container, submits the job, and
-collects results. When authentication is needed, it asks you to run
-`bash scripts/nano4.sh login` in a separate interactive terminal. Enter your
-password and MFA code into SSH, then tell the agent you are connected. Keep
-these secrets out of chat and configuration files.
-
-The terminal and agent must use the same local OS user and, on Windows, the
-same WSL distribution. The agent can then reuse the SSH connection until it
-expires. Command runners without an interactive terminal, including Codex
-CLI's `!` runner, cannot perform this login step.
-
-### Run manually (optional)
-
-After completing the iService setup above, you can also run the same steps
-yourself. Run all helper commands locally from the repository root.
-
-This example prepares Singularity/Apptainer images and runs Slurm jobs on Nano4.
-The default job runs `nvidia-smi` inside an NVIDIA NGC PyTorch container on one
-H200 GPU.
-
-### 1. Configure access
+The agent handles setup, submission, and result collection. It prompts you to
+run the login command in your own terminal when authentication is needed:
 
 ```bash
-bash scripts/nano4.sh configure YOUR_SUPERCOMPUTER_ACCOUNT YOUR_PROJECT_SYSTEM_CODE
-bash scripts/nano4.sh login
+bash scripts/nano4/login.sh
 ```
 
-Enter your password and MFA directly into the terminal when SSH requests them.
-The helper creates the ignored `secrets/.env` with only the username and project
-ID. It manages SSH connection sharing without changing `~/.ssh/config`.
-Subsequent commands reuse the connection with no local idle expiration.
-Run `logout` to close it. Shutdown closes it, and sleep or network changes
-may break it. Run `login` again when needed.
-Nano4 may disconnect it earlier. Already submitted Slurm jobs continue running.
-
-### 2. Prepare a container and submit a job
-
-**Run these helper commands locally. Apptainer itself runs only on Nano4, inside
-an allocated Slurm compute node. You do not need Apptainer or Docker locally.**
-
-```bash
-bash scripts/nano4.sh prepare docker://nvcr.io/nvidia/pytorch:26.09-py3 container.sif
-bash scripts/nano4.sh submit cluster/nano4/smoke.slurm container.sif
-```
-
-The PyTorch tag is the latest NGC release as of 2026-10-08. You can supply any
-supported container URI and choose its SIF filename. For example:
-
-```bash
-bash scripts/nano4.sh prepare docker://ubuntu:24.04 ubuntu.sif
-```
-
-Preparation defaults to one H200 GPU, eight CPU cores, 96 GB RAM, and 30 minutes
-in `dev`. Append standard `srun` options to override those defaults, for example
-`--mem=128G --time=01:00:00`. Extraction, cache, and compression use
-`SLURM_TMPDIR` or `/dev/shm` on the compute node. The completed SIF is copied to
-`/work`, and temporary storage is cleaned. Repeated preparation reuses a SIF
-with the same recorded source. Choose another filename for a different image.
-
-`submit` accepts any local Slurm script and passes subsequent arguments to it.
-Put resource requests in that script, write logs under `logs/`, and save output
-artifacts under `outputs/`. The helper creates both directories before submission.
-The example script runs `nvidia-smi` by default, or a command you supply:
-
-```bash
-bash scripts/nano4.sh submit cluster/nano4/smoke.slurm ubuntu.sif cat /etc/os-release
-```
-
-Choose a command installed in your chosen image. For your own workload, replace
-`cluster/nano4/smoke.slurm` with your script and upload any inputs it needs.
-
-The default remote run directory is `/work/<username>/agentic-samples`.
-Set `NCHC_REMOTE_DIR` in your local shell for a different directory. **Use a
-fresh directory for each new submission.** Repeating `submit` in the same
-directory returns the existing job ID to prevent accidental duplicate jobs.
-If submission is interrupted without a recorded ID, inspect Slurm before retrying.
-
-```bash
-export NCHC_REMOTE_DIR=/work/YOUR_SUPERCOMPUTER_ACCOUNT/my-next-run
-```
-
-Only scripts and selected results use the shared login connection. For large
-input or output transfers, Nano4's data-transfer service uses port 2222 and
-requires separate authentication. If a runtime needs a site module, load it in
-the preparation or job script. The helper uses the lowercase Slurm account form
-of your iService Project system code.
-
-### 3. Check and download results
-
-```bash
-bash scripts/nano4.sh status
-bash scripts/nano4.sh fetch
-```
-
-`fetch` downloads `logs/`, `outputs/`, and the submission record into
-`results/<job-id>/`, which is ignored by Git. To retrieve other files or
-folders, pass paths relative to the remote run directory:
-
-```bash
-bash scripts/nano4.sh fetch logs outputs/my-model.pt
-```
-
-The smoke test passes when its downloaded log shows an H200 GPU and Slurm
-reports `COMPLETED` with exit code `0:0`. This checks GPU visibility, not PyTorch
-operations. Run status queries manually. Nano4 discourages frequent polling.
-
-```bash
-bash scripts/nano4.sh exec hostname  # Optional remote command.
-bash scripts/nano4.sh logout        # Close the shared connection when finished.
-```
-
-When authentication expires, run `login` again and resume. Check host driver
-compatibility before running actual PyTorch/CUDA workloads.
+See [docs/nano4.md](docs/nano4.md) for prerequisites, the three login prompts,
+manual commands, container preparation, job options, and result downloads.
+Skills in `skills/` are linked from `.agents/skills` and `.claude/skills`
+for automatic discovery.

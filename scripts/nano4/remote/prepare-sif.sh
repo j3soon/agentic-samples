@@ -1,24 +1,35 @@
 #!/usr/bin/env bash
 # Run through srun. Keep image extraction and compression in node-local storage.
 set -euo pipefail
-: "${SLURM_JOB_ID:?Run this script in a Slurm allocation}"
+if [[ -z ${SLURM_JOB_ID:-} ]]; then
+  echo 'Run this script in a Slurm allocation.' >&2
+  exit 2
+fi
 work_dir=${1:?Pass the absolute persistent working directory}
 mkdir -p "$work_dir"
 work_dir=$(cd "$work_dir" && pwd)
 image_uri=${2:?Pass a container image URI}
 image=${3:?Pass the SIF filename}
-[[ "$image" =~ ^[a-zA-Z0-9_.-]+\.sif$ ]] || { echo 'Invalid SIF filename.' >&2; exit 2; }
+if [[ ! "$image" =~ ^[a-zA-Z0-9_.-]+\.sif$ ]]; then
+  echo 'Invalid SIF filename.' >&2
+  exit 2
+fi
 
-if command -v apptainer >/dev/null 2>&1; then runtime=apptainer
-elif command -v singularity >/dev/null 2>&1; then runtime=singularity
-else echo 'Load the site container runtime module first.' >&2; exit 2; fi
+if command -v apptainer >/dev/null 2>&1; then
+  runtime=apptainer
+elif command -v singularity >/dev/null 2>&1; then
+  runtime=singularity
+else
+  echo 'Load the site container runtime module first.' >&2
+  exit 2
+fi
 
 if [[ -f "$work_dir/$image" ]]; then
   # Reuse only a verified SIF whose recorded source matches the requested image.
-  [[ -f "$work_dir/$image.source" && $(cat "$work_dir/$image.source") == "$image_uri" ]] || {
+  if [[ ! -f "$work_dir/$image.source" || $(cat "$work_dir/$image.source") != "$image_uri" ]]; then
     echo 'This filename already exists with a different or unknown source. Choose another SIF name.' >&2
     exit 2
-  }
+  fi
   "$runtime" inspect "$work_dir/$image" >/dev/null
   echo "Reusing $work_dir/$image"
   exit 0
