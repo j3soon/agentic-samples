@@ -99,4 +99,4 @@ unset rap_api_key
 
 Use your provider's base URL if it differs from the example.
 
-[Continue in README: run workloads on Nano4](../README.md#3-run-workloads-on-nano4).
+[Continue in README: check single-node GPU access on Nano4](../README.md#3-check-single-node-gpu-access-on-nano4).

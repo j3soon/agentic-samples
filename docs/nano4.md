@@ -1,6 +1,6 @@
 # Nano4 container jobs
 
-Optional supplement to the [README walkthrough](../README.md#3-run-workloads-on-nano4),
+Optional supplement to the [README walkthrough](../README.md#3-check-single-node-gpu-access-on-nano4),
 covering manual commands, resource choices, and submission recovery.
 
 First, if you have used Nano4 before, back up any existing files you want to keep
@@ -49,7 +49,7 @@ the local agent prepare containers and submit workloads remotely.
 
 Start a local agent session in this repository and ask:
 
-> Submit the Nano4 container smoke test.
+> Run the Nano4 single-node GPU access check on one H200 GPU with cluster/nano4/smoke.slurm and download the logs.
 
 Skills are stored in `skills/` and linked from `.agents/skills` and
 `.claude/skills` for automatic discovery. You do not need to name a skill in
@@ -153,8 +153,9 @@ node. The completed SIF is copied to `/work`, and temporary storage is cleaned.
 Repeated preparation reuses a SIF with the same recorded source. Choose another
 filename for a different image.
 
-The smoke script runs `nvidia-smi` and saves logs under `logs/`. The submission
-script creates `logs/` and `outputs/` before Slurm opens the job's output files.
+The single-node GPU check runs `nvidia-smi` and saves logs under `logs/`.
+The submission script creates `logs/` and `outputs/` before Slurm opens the
+job's output files.
 If submission fails without a recorded ID, follow
 [submission recovery](#submission-recovery) before trying again.
 
@@ -182,9 +183,9 @@ so rerunning the same command can resume them:
 bash scripts/nano4/download.sh logs outputs/my-model.pt
 ```
 
-The smoke test passes when its downloaded log shows an H200 GPU and Slurm
-reports `COMPLETED` with exit code `0:0`. This checks GPU visibility, not PyTorch
-operations. Run status queries manually. Nano4 discourages frequent polling.
+The single-node GPU check passes when its downloaded log shows an H200 GPU
+and Slurm reports `COMPLETED` with exit code `0:0`. This checks GPU visibility,
+not PyTorch operations. Run status queries manually. Nano4 discourages frequent polling.
 
 #### Cancel an unwanted job
 
@@ -281,8 +282,8 @@ The evidence record can be shared with a cluster administrator by the user.
 
 ## Other images and resources
 
-These are alternatives to the main smoke test, not its next steps. Each new
-job needs a fresh run directory. For example, prepare Ubuntu and print its
+These are alternatives to the single-node GPU check. Each new job needs a fresh
+run directory. For example, prepare Ubuntu and print its
 release information instead of running `nvidia-smi`:
 
 ```bash
@@ -317,4 +318,9 @@ bash scripts/nano4/prepare-sif.sh docker://nvcr.io/nvidia/pytorch:26.09-py3 cont
   --gpus-per-node=2 --cpus-per-task=24 --mem=400G
 ```
 
-[Return to README: run workloads on Nano4](../README.md#3-run-workloads-on-nano4).
+To continue with multi-node training, see
+[README step 4](../README.md#4-run-multi-node-workloads-on-nano4).
+The optional [PyTorch scaling guide](pytorch-scaling.md) preserves the recorded
+initial and optimized examples, with manual commands and reference measurements.
+
+[Return to README: check single-node GPU access on Nano4](../README.md#3-check-single-node-gpu-access-on-nano4).

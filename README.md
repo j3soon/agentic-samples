@@ -13,11 +13,12 @@ Give them a clear assignment, a suitable workspace, and a way to check their
 work. For optimization, that means a baseline, a correctness test, and a
 performance target. Your team's NVIDIA mentor can help with domain questions.
 
-This guide follows three stages, each with a short demonstration:
+This guide follows four stages, each with a short demonstration:
 
 1. [Understand the agent and model provider](#1-understand-the-agent-and-model-provider).
 2. [Give the agent a suitable environment](#2-give-the-agent-a-suitable-environment).
-3. [Run workloads on Nano4](#3-run-workloads-on-nano4).
+3. [Check single-node GPU access on Nano4](#3-check-single-node-gpu-access-on-nano4).
+4. [Run multi-node workloads on Nano4](#4-run-multi-node-workloads-on-nano4).
 
 Follow this README for the complete workflow. If your Nano4 account is not set
 up, also read [NCHC iService setup](docs/nchc-iservice.md). Other Markdown files
@@ -209,7 +210,7 @@ the selected provider's policy controls data sent to the model.
 ### Demo: run the same agent inside Docker
 
 This demo is optional. If you already run the agent in a suitable container or
-dedicated VM, keep that session and continue to [Nano4](#3-run-workloads-on-nano4).
+dedicated VM, keep that session and continue to [Nano4](#3-check-single-node-gpu-access-on-nano4).
 Run Docker build and launch commands on the machine with Docker installed.
 Install [Docker Engine or Docker Desktop](https://docs.docker.com/get-started/get-docker/)
 on your machine first. You do not need Docker inside the agent container.
@@ -315,7 +316,7 @@ To update, rerun the build and launch commands with the same mounts.
 
 </details>
 
-## 3. Run workloads on Nano4
+## 3. Check single-node GPU access on Nano4
 
 Run the agent **locally**, on your computer, in Docker, or in a dedicated VM.
 It connects to Nano4 over SSH. The **login node** handles
@@ -352,7 +353,7 @@ flowchart LR
 
 Preparation pulls a Docker/OCI image from a registry such as Docker Hub or
 NVIDIA NGC, converts it to SIF on an allocated compute node, and saves it to
-`/work`. The smoke test uses NVIDIA NGC's PyTorch image. See
+`/work`. The single-node GPU check uses NVIDIA NGC's PyTorch image. See
 [Apptainer's registry support](https://apptainer.org/docs/user/latest/docker_and_oci.html)
 for how this conversion works.
 
@@ -400,7 +401,12 @@ At that rate, one GPU for one hour costs NT$60, and a full eight-GPU node costs
 **NT$480 per hour**. Estimate compute cost as allocated GPUs × running hours ×
 NT$60. Container preparation also uses a paid compute allocation.
 
-### Demo: submit a container smoke test
+### Demo: check GPU access on one node with one GPU
+
+Run `nvidia-smi` inside a PyTorch container on one H200 GPU using
+[smoke.slurm](cluster/nano4/smoke.slurm). This checks that Slurm allocates the GPU
+and that the container can access it. Step 4 builds on this path with actual
+PyTorch training across multiple nodes.
 
 If your Nano4 account and project access are not set up, first follow
 [NCHC iService credential setup](docs/nchc-iservice.md#1-nano4-ssh-credentials).
@@ -416,9 +422,11 @@ In your chosen agent session, ask:
 
 > Run the Nano4 single-GPU access check and download its logs.
 
-The agent configures your account identifiers, prepares the image on allocated
-compute resources, submits the job, and collects results. When it requests
-authentication, open a separate terminal in the **same environment**:
+The agent checks local tools, configures your account identifiers, prepares the
+image on allocated compute resources, submits the job, and collects results.
+It reports the job ID, run directory, SIF path, and local logs. Keep the SIF path
+for step 4. When it requests authentication, open a separate terminal in the
+**same environment**:
 
 - **Host or VM:** open another terminal as the same OS user and run
   `cd ~/nchc-hackathon`, or change to your existing clone.
@@ -470,9 +478,56 @@ bash scripts/nano4/exec.sh scancel JOB_ID
 Closing the agent, Docker container, or SSH connection does not cancel jobs.
 Keep the container running while you need its shared SSH connection.
 
-Once the smoke test works, give the agent a workload and measurable goal:
+Once the single-node GPU check passes, continue to the scaling experiment below.
 
-> Inspect my workload and establish a correctness check and performance baseline on Nano4. Propose an optimization experiment, run it through Slurm, and compare the results. Preserve the baseline and report the measurements and changes.
+## 4. Run multi-node workloads on Nano4
+
+A **weak scaling** experiment keeps work per GPU fixed. Adding GPUs increases
+the total work, ideally without increasing runtime. This example trains a
+Transformer on synthetic data with PyTorch DDP. It needs no dataset download
+and measures performance, not model quality. GPU workers exchange gradients
+within and across nodes.
+
+| GPUs | Nodes | Global batch |
+|---:|---:|---:|
+| 1 | 1 | 128 |
+| 8 | 1 | 1024 |
+| 16 | 2 | 2048 |
+| 32 | 4 | 4096 |
+
+Each GPU handles 128 sequences per step. One measured interval follows warmup,
+targeting 10 to 30 seconds and under one minute including warmup. The two-minute
+Slurm limit allows startup and cleanup. Queue waits, downloads, and agent
+responses take additional time.
+
+Ask your agent:
+
+> Run the recorded initial PyTorch weak scaling experiment on Nano4.
+
+**Look for:** completed jobs at all four GPU counts, verified model checkpoints,
+and a training-time and efficiency plot.
+
+### Reference experiment
+
+The [initial and optimized versions](examples/pytorch-scaling/reference/README.md)
+use the same trainer. Only CPU allocation changes: **1 CPU per GPU** initially,
+then **12 CPUs per GPU**, Nano4's [published H200 maximum](https://man.twcc.ai/@nano4-manual/SJM_FuxDWe).
+An eight-GPU node therefore receives 8 cores initially and 96 after the fix.
+
+Initial scaling:
+
+![Initial PyTorch weak scaling with 1 CPU per GPU](docs/assets/pytorch-scaling-initial.png)
+
+Optimized scaling:
+
+![Optimized PyTorch weak scaling with 12 CPUs per GPU](docs/assets/pytorch-scaling-optimized.png)
+
+Weak scaling efficiency is the single-GPU time divided by the time at a larger
+GPU count. Each sweep uses its own single-GPU baseline. Compare absolute times
+between the two CPU settings as well as the curves.
+These measurements illustrate the example. Results depend on placement and load.
+The optional [reference guide](docs/pytorch-scaling.md) gives manual commands
+and the measured timings.
 
 ## Optional supplementary material
 
@@ -487,3 +542,5 @@ want more detail or manual alternatives:
   installation alternatives, and why the Docker mounts are scoped this way.
 - [RAP](docs/rap.md): provider configuration, privacy details, and image tests.
 - [Nano4](docs/nano4.md): manual Slurm commands, resource choices, and recovery.
+- [PyTorch scaling reference](docs/pytorch-scaling.md): initial and optimized
+  versions, manual commands, and CPU allocation comparisons.

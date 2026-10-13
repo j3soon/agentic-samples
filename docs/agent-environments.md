@@ -121,7 +121,7 @@ OpenCode runs in a detached container. Exiting the agent leaves that container
 and its SSH master running for the next session. Use the README's `docker exec`
 command to return. Keep the container running while you need SSH. Stopping it
 closes the connection, while submitted Slurm jobs continue. The
-[README Nano4 demo](../README.md#demo-submit-a-container-smoke-test) shows how to
+[README Nano4 demo](../README.md#demo-check-gpu-access-on-one-node-with-one-gpu) shows how to
 open the matching container terminal for login and how to cancel unwanted jobs.
 
 OpenCode uses the official `latest` image, and Pi installs the current package
@@ -159,4 +159,4 @@ whole home directory just to reuse credentials.
 
 Account and API credential setup is in [nchc-iservice.md](nchc-iservice.md).
 
-[Continue in README: run workloads on Nano4](../README.md#3-run-workloads-on-nano4).
+[Continue in README: check single-node GPU access on Nano4](../README.md#3-check-single-node-gpu-access-on-nano4).
