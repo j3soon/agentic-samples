@@ -1,6 +1,7 @@
 FROM ghcr.io/anomalyco/opencode:latest
 
 RUN apk add --no-cache bash ca-certificates curl git openssh-client rsync \
+    python3 py3-pip py3-matplotlib \
     && rm -rf /tmp/opencode
 
 ARG USER_UID=1000

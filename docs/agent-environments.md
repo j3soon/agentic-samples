@@ -117,8 +117,10 @@ credentials, and sessions without exposing your host agent's home. OpenCode uses
 `/home/agent`, and Pi uses `/home/node`. Settings start independently from your
 host agent. Pi starts in a shell so you can configure RAP before launching it.
 
-Keep the container running while the agent works. Stopping it closes its SSH
-connection, while submitted Slurm jobs continue. The
+OpenCode runs in a detached container. Exiting the agent leaves that container
+and its SSH master running for the next session. Use the README's `docker exec`
+command to return. Keep the container running while you need SSH. Stopping it
+closes the connection, while submitted Slurm jobs continue. The
 [README Nano4 demo](../README.md#demo-submit-a-container-smoke-test) shows how to
 open the matching container terminal for login and how to cancel unwanted jobs.
 

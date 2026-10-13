@@ -139,10 +139,9 @@ You may also give this rotatable key to the agent. See
 Exit with `/exit` and restart in the same environment to refresh provider settings:
 
 - **Host or VM:** run `opencode --auto` again from the repository.
-- **Docker:** rerun the `docker run` command from the
-  [Docker demo below](#demo-run-the-same-agent-inside-docker)
-  in your host terminal, from the repository with the same mounts. `/exit`
-  removes the old container, but its mounted settings remain. No rebuild is needed.
+- **Docker:** run `docker exec -it opencode opencode --auto` in your host
+  terminal. `/exit` leaves the container and its SSH connection running.
+  No container restart or rebuild is needed.
 
 Select `nchc-rap/Kimi-K3` with `/models`. In the RAP session, ask:
 
@@ -232,33 +231,45 @@ If your agent already built the image, skip the first line below.
 
 ```bash
 docker build --pull --no-cache --build-arg USER_UID="$(id -u)" -t opencode docker/opencode
-mkdir -p "$HOME/docker/opencode"
-chmod 700 "$HOME/docker/opencode"
-docker run --rm -it --init --name opencode \
+opencode_home=${OPENCODE_PRIVATE_HOME:-"$HOME/docker/opencode"}
+mkdir -p "$opencode_home"
+chmod 700 "$opencode_home"
+docker run -d --init --name opencode \
   --user "$(id -u):$(id -g)" \
   --mount "type=bind,src=$PWD,dst=/workspace" \
-  --mount "type=bind,src=$HOME/docker/opencode,dst=/home/agent" \
-  opencode --auto
+  --mount "type=bind,src=$opencode_home,dst=/home/agent" \
+  --entrypoint sleep opencode infinity
+docker exec -it opencode opencode --auto
 ```
 
 The [OpenCode Dockerfile](docker/opencode/Dockerfile) extends the
-[official image](https://opencode.ai/docs/#install) with this repository's tools.
-The workspace appears at `/workspace`. The private home keeps settings,
-credentials, and sessions between runs. Build with your host UID so SSH can
+[official image](https://opencode.ai/docs/#install) with this repository's tools,
+including Python and Matplotlib for plotting.
+The workspace appears at `/workspace`. Set `OPENCODE_PRIVATE_HOME` to use a
+different private home. The private home keeps settings, credentials, and
+sessions between runs. Build with your host UID so SSH can
 identify the container user. Keep unrelated personal files outside these mounts
 and do not mount the Docker socket.
 
 The container starts with its own settings and credentials. In the container's
 OpenCode session, use a free model for setup and follow
 [Connect RAP in OpenCode](#connect-rap-in-opencode), including key entry,
-restarting the container, and testing image reading.
+relaunching OpenCode in the same container, and testing image reading.
 
 **Look for:** the same project available inside the container, RAP working in
-that environment, and settings retained when you relaunch with the same mounts.
+that environment, and settings retained when you relaunch OpenCode.
 You can now continue from this agent session.
 
-To update OpenCode later, exit it, rerun the build command above, then rerun
-the launch command with the same mounts. `--pull` refreshes the base image and
+Exit OpenCode with `/exit` and return with the `docker exec` command above.
+The detached container keeps Nano4's SSH connection alive between agent
+sessions. To stop it, run `docker stop opencode`. To return after stopping,
+run `docker start opencode`, then the `docker exec` command. Stopping or
+restarting the container closes SSH, so repeat Nano4 login when needed.
+
+To update OpenCode or change workspace mounts, exit it and run
+`docker stop opencode` and `docker rm opencode`. Rebuild when updating,
+then rerun the launch block with the intended workspace and private home.
+Mounted files and settings persist. `--pull` refreshes the base image and
 `--no-cache` reruns installation steps.
 
 <details>

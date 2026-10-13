@@ -42,6 +42,8 @@ in the user's own terminal. Rsync reuses the authenticated SSH master.
   homes retain credentials and settings, but recreating a container closes its
   live SSH connection. Check the shared connection after a restart and request
   login only when needed.
+  The README OpenCode Docker workflow keeps the container running after agent
+  exit. Relaunch OpenCode with `docker exec` to reuse the live SSH master.
   Follow README step 3's login handoff, using option 2 (Mobile APP PUSH) by
   default. Enter the machine password in the terminal and approve on the phone.
 - Set `NCHC_REMOTE_DIR` to a fresh absolute directory for each new submission
