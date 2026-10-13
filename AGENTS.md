@@ -74,6 +74,9 @@
   Monitor downloaded error logs. Record node-specific CUDA or network failures
   with node names, job IDs, errors, and log paths in ignored
   `artifacts/nano4-node-issues.md`. Update the node list when issues arise.
+  Check both Apptainer and Singularity before excluding a node for a missing
+  runtime. Load the site Singularity module if needed, and choose the runtime
+  on each allocated node. Missing Apptainer alone is not a node fault.
   Confirm a job failed before retrying in a fresh directory on other nodes.
   At the end of the turn, list all unresolved suspected nodes alongside the
   remaining jobs. Warnings in successful jobs alone do not establish a bad node.

@@ -79,6 +79,9 @@ in the user's own terminal. Rsync reuses the authenticated SSH master.
   If healthy capacity is unavailable, consider one short targeted check of a
   suspect. Keep the exclusions unless that check succeeds. A busy queue alone
   does not establish recovery.
+  Before excluding a node for a missing runtime, check both Apptainer and
+  Singularity, including the site Singularity module. Select the runtime on
+  each allocated node. Missing Apptainer alone does not establish a node fault.
 - Preparation builds in allocated node-local storage and copies the SIF to
   `/work`. Defaults are one GPU, 12 CPUs, and 200G RAM. Increase resources
   proportionally when needed, respecting per-GPU limits. The supplied workflow

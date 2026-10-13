@@ -249,6 +249,13 @@ ignored `artifacts/nano4-node-issues.md`. Update both files when a node issue ar
 CUDA visibility failures and InfiniBand/NCCL failures need different
 diagnostics. Warnings in a successful job alone do not establish a faulty node.
 
+Missing `apptainer` alone is not a node fault. Check `singularity` too.
+Some nodes provide it through `module load singularity`, following Nano4's
+[module workflow](https://man.twcc.ai/@nano4-manual/BJyI6dgw-g).
+The supplied jobs select the runtime on each node and load that module when
+neither command is on PATH. Choosing only on the first node can fail when
+other nodes have different runtimes.
+
 The single-GPU check shows device visibility through `nvidia-smi`. Training
 also needs [CUDA runtime initialization](https://docs.pytorch.org/docs/stable/notes/cuda.html).
 The trainer's `a CUDA GPU with BF16 support is required` message combines

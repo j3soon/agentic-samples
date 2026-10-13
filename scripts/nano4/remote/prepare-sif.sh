@@ -20,8 +20,8 @@ if command -v apptainer >/dev/null 2>&1; then
 elif command -v singularity >/dev/null 2>&1; then
   runtime=singularity
 else
-  echo 'Load the site container runtime module first.' >&2
-  exit 2
+  module load singularity
+  runtime=singularity
 fi
 
 if [[ -f "$work_dir/$image" ]]; then

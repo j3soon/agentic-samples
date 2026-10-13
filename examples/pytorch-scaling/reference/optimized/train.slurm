@@ -18,12 +18,6 @@ cp train.py outputs/train.py
 scontrol show job "$SLURM_JOB_ID" > outputs/slurm-job.txt
 printf '%s\n' "$image" > outputs/container.txt
 
-if command -v apptainer >/dev/null 2>&1; then
-  runtime=apptainer
-else
-  runtime=singularity
-fi
-
 # One Slurm task per node launches one torchrun worker per allocated GPU.
 export GPUS_PER_NODE=${SLURM_GPUS_PER_NODE:?Request --gpus-per-node}
 [[ "$GPUS_PER_NODE" =~ ^[0-9]+$ ]] || exit 2
@@ -34,12 +28,22 @@ export SCALING_MASTER_PORT=$((15000 + SLURM_JOB_ID % 40000))
 export OMP_NUM_THREADS=1
 export PYTHONUNBUFFERED=1
 
+# Choose the runtime on each node. Some nodes need the shared Singularity module.
 # Only the run directory is explicitly mounted. All nodes share its outputs.
 srun --nodes="$SLURM_JOB_NUM_NODES" --ntasks="$SLURM_JOB_NUM_NODES" \
   --ntasks-per-node=1 --kill-on-bad-exit=1 \
   --output='logs/node-%N.out' --error='logs/node-%N.err' \
-  "$runtime" exec --nv --bind "$SLURM_SUBMIT_DIR:/workspace" "$image" \
-  bash -c '
+  bash -lc '
+    set -e
+    if command -v apptainer >/dev/null 2>&1; then
+      runtime=apptainer
+    else
+      command -v singularity >/dev/null 2>&1 || module load singularity
+      runtime=singularity
+    fi
+    "$runtime" --version
+    exec "$runtime" exec --nv --bind "$SLURM_SUBMIT_DIR:/workspace" "$@"
+  ' bash "$image" bash -c '
     cd /workspace
     nvidia-smi
     exec torchrun --nnodes="$SLURM_JOB_NUM_NODES" \
