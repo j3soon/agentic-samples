@@ -239,6 +239,46 @@ After confirming no job was accepted, correct the rejected request and choose
 a fresh `NCHC_REMOTE_DIR` as in step 3. Prepare the image and submit there.
 Keep the old marker for inspection.
 
+## Suspected faulty nodes
+
+Keep unresolved suspected hostnames in tracked
+`cluster/nano4/excluded-nodes.txt`, one per line without comments or duplicates.
+Keep their job IDs, exact errors, and downloaded log paths in
+ignored `artifacts/nano4-node-issues.md`. Update both files when a node issue arises.
+CUDA visibility failures and InfiniBand/NCCL failures need different
+diagnostics. Warnings in a successful job alone do not establish a faulty node.
+
+The single-GPU check shows device visibility through `nvidia-smi`. Training
+also needs [CUDA runtime initialization](https://docs.pytorch.org/docs/stable/notes/cuda.html).
+The trainer's `a CUDA GPU with BF16 support is required` message combines
+CUDA availability and BF16 checks, so it does not identify the cause by itself.
+During validation, that message occurred alongside `ERR!` GPU state fields,
+and another node exposed only seven of eight allocated GPUs. The same image
+worked on other nodes. These observations justify temporary exclusions,
+while the driver or hardware cause remains unconfirmed.
+
+Check worker placement before blaming a node for an NCCL failure. Multiple
+worker groups on one host can produce `Multiple Ranks are using the same GPU`.
+Fix the launcher in that case. Use [NVIDIA's troubleshooting guide](https://docs.nvidia.com/deeplearning/nccl/user-guide/docs/troubleshooting.html)
+to distinguish GPU, network, and runtime failures.
+
+Read the node list before future jobs. `submit.sh` and `prepare-sif.sh` apply
+it automatically and print the exclusions. They merge additional
+[`--exclude=NODE1,NODE2`](https://slurm.schedmd.com/sbatch.html#OPT_exclude)
+options, passed before `--` in `submit.sh` or after the image name in
+`prepare-sif.sh`. Apply the list yourself when using Slurm directly.
+
+Monitor downloaded error logs. After accounting confirms a node-specific job
+failure, retry in a fresh directory on other nodes. Limit placement retries to
+two before reporting the unresolved problem. Keep each entry until a targeted
+check or administrator confirmation resolves it. If healthy capacity is
+unavailable, consider a short check of one suspect before using it again.
+A busy queue alone does not establish recovery.
+
+After cluster actions, end the turn with `bash scripts/nano4/exec.sh squeue --me`
+and report all remaining running/pending jobs and unresolved suspected nodes.
+The evidence record can be shared with a cluster administrator by the user.
+
 ## Other images and resources
 
 These are alternatives to the main smoke test, not its next steps. Each new

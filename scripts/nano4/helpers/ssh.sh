@@ -57,3 +57,32 @@ require_run_directory() {
     exit 2
   fi
 }
+
+# Merge the local node list with caller exclusions into one Slurm option.
+load_slurm_options() {
+  slurm_options=()
+  local excluded='' node_file="$repo_dir/cluster/nano4/excluded-nodes.txt"
+  if [[ -s "$node_file" ]]; then
+    excluded=$(paste -sd, "$node_file")
+    printf 'Avoiding suspected nodes: %s\n' "$excluded" >&2
+  fi
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --exclude=*) excluded="${excluded:+$excluded,}${1#*=}" ;;
+      -x?*) excluded="${excluded:+$excluded,}${1#-x}" ;;
+      --exclude|-x)
+        if [[ $# -lt 2 || $2 == -* ]]; then
+          echo 'Pass a node list after --exclude or -x.' >&2
+          return 2
+        fi
+        shift
+        excluded="${excluded:+$excluded,}$1"
+        ;;
+      *) slurm_options+=("$1") ;;
+    esac
+    shift
+  done
+  if [[ -n "$excluded" ]]; then
+    slurm_options+=("--exclude=$excluded")
+  fi
+}

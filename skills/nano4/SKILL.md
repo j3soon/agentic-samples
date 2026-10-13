@@ -62,6 +62,23 @@ in the user's own terminal. Rsync reuses the authenticated SSH master.
   `submit.sh JOB_SCRIPT [JOB_ARGS...]`. Use the smoke script only for a requested
   GPU visibility test. Upload workload inputs separately as needed.
   Override Slurm resources with `submit.sh SBATCH_OPTIONS... -- JOB_SCRIPT [JOB_ARGS...]`.
+- Before preparation or submission, read `cluster/nano4/excluded-nodes.txt`
+  if present. This tracked file contains one unresolved suspected hostname per
+  line, without comments or duplicates. `prepare-sif.sh` and `submit.sh` apply it automatically
+  and merge any explicit `--exclude` options. Apply it yourself for direct Slurm
+  commands. Keep it across sessions.
+  Monitor downloaded logs for node-specific CUDA initialization or NCCL/network
+  failures. Record each suspect's hostname, job ID, exact error, and local log
+  path in ignored `artifacts/nano4-node-issues.md`, and update the node list.
+  Separate confirmed observations from possible causes. A warning in a
+  successful job or an unidentified failing rank is insufficient to mark every
+  allocated node as bad. After confirming failure with accounting, retry in a
+  fresh run directory excluding the suspects, with at most two placement retries
+  before reporting the unresolved failure. Keep entries until a successful
+  targeted check or administrator confirmation resolves them.
+  If healthy capacity is unavailable, consider one short targeted check of a
+  suspect. Keep the exclusions unless that check succeeds. A busy queue alone
+  does not establish recovery.
 - Preparation builds in allocated node-local storage and copies the SIF to
   `/work`. Defaults are one GPU, 12 CPUs, and 200G RAM. Increase resources
   proportionally when needed, respecting per-GPU limits. The supplied workflow
@@ -84,6 +101,10 @@ in the user's own terminal. Rsync reuses the authenticated SSH master.
   Closing the agent or connection does not stop submitted jobs. When requested,
   cancel the specific job with `exec.sh scancel JOB_ID` and check its status.
   Submit only jobs within the user's requested scope.
+- Before ending a turn after cluster actions, run `exec.sh squeue --me`.
+  Report all of this user's remaining running and pending jobs and all unresolved
+  suspected nodes, with their evidence file for later administrator follow-up.
+  If the queue check fails, say that the queue is unverified.
 
 ## Choose a partition
 

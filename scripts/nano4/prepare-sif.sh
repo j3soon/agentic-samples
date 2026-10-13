@@ -17,6 +17,7 @@ shift 2
 
 # Shared account parsing and SSH options stay in one readable helper.
 source "$(dirname "${BASH_SOURCE[0]}")/helpers/ssh.sh"
+load_slurm_options "$@"
 require_run_directory
 require_connection
 account=$(printf '%s' "$project_code" | tr '[:upper:]' '[:lower:]')
@@ -28,5 +29,5 @@ rsync -a --protect-args -e "$rsync_ssh" -- "$repo_dir/scripts/nano4/remote/prepa
 # Extra srun options override these defaults for larger builds.
 printf -v remote_command '%q ' srun --account="$account" --partition=dev \
   --nodes=1 --ntasks=1 --gpus-per-node=1 --cpus-per-task=12 --mem=200G \
-  --time=04:00:00 "$@" bash "$remote_dir/prepare-sif.sh" "$remote_dir" "$image_uri" "$image_name"
+  --time=04:00:00 "${slurm_options[@]}" bash "$remote_dir/prepare-sif.sh" "$remote_dir" "$image_uri" "$image_name"
 ssh "${ssh_options[@]}" "$target" "$remote_command"

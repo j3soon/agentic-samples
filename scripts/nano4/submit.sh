@@ -29,6 +29,7 @@ shift
 
 # Shared account parsing and SSH options stay in one readable helper.
 source "$(dirname "${BASH_SOURCE[0]}")/helpers/ssh.sh"
+load_slurm_options "${sbatch_options[@]}"
 require_run_directory
 require_connection
 
@@ -39,5 +40,5 @@ rsync -a --protect-args -e "$rsync_ssh" -- "$job_script" "$target:$remote_dir/jo
 rsync -a --protect-args -e "$rsync_ssh" -- "$repo_dir/scripts/nano4/remote/submit.sh" "$target:$remote_dir/"
 # SSH takes one command string. %q preserves each argument exactly.
 printf -v remote_command '%q ' bash "$remote_dir/submit.sh" "$remote_dir" "$project_code" \
-  "${sbatch_options[@]}" -- "$@"
+  "${slurm_options[@]}" -- "$@"
 ssh "${ssh_options[@]}" "$target" "$remote_command"

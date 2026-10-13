@@ -57,6 +57,25 @@
   GPU and consume budget. Generally avoid this and reserve allocations for
   container preparation and workloads. Release unused allocations. See
   `docs/agent-environments.md`.
+- After Slurm submissions, allocations, cancellations, or remote cleanup,
+  run `bash scripts/nano4/exec.sh squeue --me` before ending the turn.
+  Report this user's remaining running and pending jobs, including jobs from
+  earlier sessions. If the check fails, report that the queue is unverified.
+  Cancel jobs only when authorized by the user.
+- Before Nano4 submissions, read `cluster/nano4/excluded-nodes.txt` if it
+  exists. This tracked file contains one unresolved suspected node per line,
+  without comments.
+  The preparation and submission scripts merge those nodes with explicit
+  Slurm `--exclude` options. Apply the list yourself for direct Slurm commands.
+  Monitor downloaded error logs. Record node-specific CUDA or network failures
+  with node names, job IDs, errors, and log paths in ignored
+  `artifacts/nano4-node-issues.md`. Update the node list when issues arise.
+  Confirm a job failed before retrying in a fresh directory on other nodes.
+  At the end of the turn, list all unresolved suspected nodes alongside the
+  remaining jobs. Warnings in successful jobs alone do not establish a bad node.
+  Scarce healthy capacity can justify a targeted check of one suspect. Keep
+  exclusions until successful validation or administrator confirmation resolves
+  them, rather than clearing the list because the queue is busy.
 
 ## Diagrams
 
