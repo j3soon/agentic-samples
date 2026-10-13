@@ -1,5 +1,8 @@
 # Nano4 container jobs
 
+Optional supplement to the [README walkthrough](../README.md#3-run-workloads-on-nano4),
+covering manual commands, resource choices, and submission recovery.
+
 First, if you have used Nano4 before, back up any existing files you want to keep
 from your home and `/work` directories to storage outside Nano4. New users can
 skip this step. This workflow treats Nano4 as a non-sensitive environment.
@@ -274,4 +277,4 @@ bash scripts/nano4/prepare-sif.sh docker://nvcr.io/nvidia/pytorch:26.09-py3 cont
   --gpus-per-node=2 --cpus-per-task=24 --mem=400G
 ```
 
-[Return to README: run jobs on Nano4](../README.md#3-run-jobs-on-nano4).
+[Return to README: run workloads on Nano4](../README.md#3-run-workloads-on-nano4).

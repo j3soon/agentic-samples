@@ -11,8 +11,11 @@
   example defaults when clearer.
 - Minimize dependencies and avoid requiring harness plugins. Support both agent
   workflows and concise manual steps.
-- Keep README focused on prompts, commands, and links. Put details in `docs/`,
-  ending guides with a link to the next README section.
+- Keep README a self-contained walkthrough focused on prompts, commands, and
+  links. Only `docs/nchc-iservice.md` may be required when account setup is
+  incomplete. Other Markdown files are optional supplements for users and
+  references for agents. Put detailed explanations and manual alternatives in
+  `docs/`, ending guides with a link back to the relevant README section.
 - Centralize credentials in `docs/nchc-iservice.md`. Keep machine passwords and
   OTPs out of chat. RAP keys may be given to the agent. Keep credentials out of
   Git and logs, store them privately, and reuse existing authentication.

@@ -1,5 +1,8 @@
 # Choose where to run the agent
 
+Optional supplement to the [README walkthrough](../README.md#2-give-the-agent-a-suitable-environment),
+covering permissions, isolation, and installation alternatives.
+
 **Prerequisite:** choose an environment where you are willing to enable YOLO
 or all-permissions mode. This lets the agent work without repeated permission
 prompts. It can modify or delete accessible files and use available credentials.
@@ -13,25 +16,13 @@ No extra Pi package or harness plugin is needed for these examples.
 
 ## Install OpenCode on Ubuntu
 
-Start here on a fresh Ubuntu host or Ubuntu in WSL2. Install the tools before
-asking the agent to clone the repository or access Nano4. In a root container,
-omit `sudo` from the first two commands:
-
-```bash
-sudo apt-get update
-sudo apt-get install -y --no-install-recommends \
-  ca-certificates curl unzip git openssh-client rsync
-curl -fsSL https://opencode.ai/install -o /tmp/opencode-install.sh && bash /tmp/opencode-install.sh
-export PATH="$HOME/.opencode/bin:$PATH"
-opencode --version
-```
-
-These use the [official installer](https://opencode.ai/docs/#install).
+The [first README demo](../README.md#demo-start-opencode-and-connect-rap)
+contains the Ubuntu/WSL2 bootstrap commands and official installer.
+Install the tools before asking the agent to clone or access Nano4.
 The explicit `export` makes the binary available immediately, including when
 the installer finds no existing shell profile. Follow its profile instructions
 to keep the command available in later terminals. Downloading the installer
-before running it makes a failed download visible. If OpenCode is already
-installed, update it with `opencode upgrade`.
+before running it makes a failed download visible.
 
 If you already have Node.js and npm, the official npm installation is another
 option:
@@ -41,8 +32,8 @@ npm install -g opencode-ai
 opencode --version
 ```
 
-Then [start OpenCode from this repository](../README.md#1-set-up-a-local-agent-and-rap).
-Docker users can instead follow the
+Then [start OpenCode from an empty directory](../README.md#demo-start-opencode-and-connect-rap)
+and use the clone prompt. Docker users can instead follow the
 [container launch commands](#launch-opencode-or-pi-in-docker) below.
 
 ## Launch the agent
@@ -94,7 +85,7 @@ efficient.
 ## 2. Container on a personal computer
 
 Use a container to give the agent a dedicated workspace and its own settings.
-The launch commands below mount only the repository and a separate private home.
+The README launch commands mount only the repository and a separate private home.
 Files in these mounts remain writable by the agent and survive container removal.
 Keep unrelated personal files outside the mounts. Do not mount your whole home
 or the Docker socket into the agent container.
@@ -105,80 +96,35 @@ selected provider, so choose its data policy separately.
 
 ### Launch OpenCode or Pi in Docker
 
-If you are starting with Docker and have not cloned the repository yet, clone
-it from your terminal first:
-
-```bash
-git clone https://github.com/j3soon/agentic-samples.git ~/nchc-hackathon
-cd ~/nchc-hackathon
-```
-
-After cloning the repository, run these commands from its root on Linux,
-macOS, or Windows through WSL2.
-Install [Docker](https://docs.docker.com/get-started/get-docker/) first.
+The [README Docker demo](../README.md#demo-run-the-same-agent-inside-docker)
+contains cloning, build, launch, RAP setup, and update commands for both clients.
+Run them from your host terminal on Linux, macOS, or Windows through WSL2.
 Each image contains one agent and the tools for this repository.
-Build with your host UID so SSH can identify the container user.
-Mount the project and a separate private home to keep settings, credentials,
-and sessions between runs.
 
 **OpenCode:** [Dockerfile](../docker/opencode/Dockerfile), based on the
 [official OpenCode Docker image](https://opencode.ai/docs/#install).
 
-```bash
-docker build --pull --no-cache --build-arg USER_UID="$(id -u)" -t opencode docker/opencode
-mkdir -p "$HOME/docker/opencode"
-chmod 700 "$HOME/docker/opencode"
-docker run --rm -it --init --name opencode \
-  --user "$(id -u):$(id -g)" \
-  --mount "type=bind,src=$PWD,dst=/workspace" \
-  --mount "type=bind,src=$HOME/docker/opencode,dst=/home/agent" \
-  opencode --auto
-```
-
-OpenCode starts in `/workspace` with the repository's instructions. Use an
-available free model for setup, then follow
-[manual RAP setup](rap.md#manual-setup) for key entry,
-restart, and the image-reading test before continuing to Nano4.
-
 **Pi:** [Dockerfile](../docker/pi/Dockerfile), following
 [Pi's plain Docker guide](https://pi.dev/docs/latest/containerization#run-pi-in-plain-docker).
 
-```bash
-docker build --pull --no-cache --build-arg USER_UID="$(id -u)" -t pi docker/pi
-mkdir -p "$HOME/docker/pi"
-chmod 700 "$HOME/docker/pi"
-docker run --rm -it --init --name pi --entrypoint bash \
-  --user "$(id -u):$(id -g)" \
-  --mount "type=bind,src=$PWD,dst=/workspace" \
-  --mount "type=bind,src=$HOME/docker/pi,dst=/home/node" \
-  pi
-```
+The images include a named user with your host UID. SSH can look up that user
+inside the container instead of failing with an unknown numeric UID. The
+launch command also uses your host GID so files written through the project
+mount retain your ownership.
 
-In the Pi container shell, follow [manual RAP setup](rap.md#manual-setup),
-then launch `pi --approve` and enter your key through `/login` if needed.
-`--approve` trusts project resources for this session. Each container home
-starts with separate credentials from your host agent.
+Both clients work in `/workspace`. Their separate private homes retain settings,
+credentials, and sessions without exposing your host agent's home. OpenCode uses
+`/home/agent`, and Pi uses `/home/node`. Settings start independently from your
+host agent. Pi starts in a shell so you can configure RAP before launching it.
 
-For setup commands or Nano4 login, open a second terminal in the same container:
-
-```bash
-docker exec -it opencode bash
-# For Pi instead: docker exec -it pi bash
-```
-
-Run `bash scripts/nano4/login.sh` there when the agent requests authentication.
 Keep the container running while the agent works. Stopping it closes its SSH
-connection, while submitted Slurm jobs continue. To stop unwanted cluster work,
-[cancel the job](nano4.md#cancel-an-unwanted-job) before closing the container.
-OpenCode uses the official
-`latest` image, and Pi installs the current release when built. Update them by
-rebuilding. `--pull` refreshes the base images. `--no-cache` reruns installation
-steps so Pi picks up the newest package:
+connection, while submitted Slurm jobs continue. The
+[README Nano4 demo](../README.md#demo-submit-a-container-smoke-test) shows how to
+open the matching container terminal for login and how to cancel unwanted jobs.
 
-```bash
-docker build --pull --no-cache --build-arg USER_UID="$(id -u)" -t opencode docker/opencode
-docker build --pull --no-cache --build-arg USER_UID="$(id -u)" -t pi docker/pi
-```
+OpenCode uses the official `latest` image, and Pi installs the current package
+when built. In the README build commands, `--pull` refreshes the base images.
+`--no-cache` reruns installation steps so Pi picks up the newest package.
 
 ## 3. Dedicated VM or disposable machine
 
@@ -211,4 +157,4 @@ whole home directory just to reuse credentials.
 
 Account and API credential setup is in [nchc-iservice.md](nchc-iservice.md).
 
-[Continue in README: set up a local agent and RAP](../README.md#1-set-up-a-local-agent-and-rap).
+[Continue in README: run workloads on Nano4](../README.md#3-run-workloads-on-nano4).

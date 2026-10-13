@@ -99,4 +99,4 @@ unset rap_api_key
 
 Use your provider's base URL if it differs from the example.
 
-[Continue in README: run jobs on Nano4](../README.md#3-run-jobs-on-nano4).
+[Continue in README: run workloads on Nano4](../README.md#3-run-workloads-on-nano4).

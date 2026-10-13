@@ -60,8 +60,14 @@ in the user's own terminal. Rsync reuses the authenticated SSH master.
   Override Slurm resources with `submit.sh SBATCH_OPTIONS... -- JOB_SCRIPT [JOB_ARGS...]`.
 - Preparation builds in allocated node-local storage and copies the SIF to
   `/work`. Defaults are one GPU, 12 CPUs, and 200G RAM. Increase resources
-  proportionally when needed, respecting per-GPU limits. Do not run local
-  Apptainer or extract layers on the login node.
+  proportionally when needed, respecting per-GPU limits. The supplied workflow
+  needs no local Apptainer. Recommend compute allocations for large builds to
+  avoid shared login-node resource limits. Distinguish this recommendation from
+  site policy. The [login-node guide](https://man.twcc.ai/@nano4-manual/BydP-_lvZg)
+  also lists compilation and building as login-node functions.
+  For custom images, preserve the Dockerfile or definition file and match the
+  image architecture to the target nodes. Check build permissions before
+  choosing a definition-file build on a local or cluster machine.
   Choose a different SIF name if an existing name has another source. If a
   runtime needs a site module, inspect and load it in the remote scripts.
 - Report the job ID. Use `status.sh` for explicit requests or bounded checks, not

@@ -1,5 +1,8 @@
 # RAP for OpenCode and Pi
 
+Optional supplement to the [README walkthrough](../README.md#connect-rap-in-opencode),
+covering configuration, privacy, and manual image tests.
+
 Use **RAP + Kimi-K3** with OpenCode by default. Pi is the secondary option for
 users who prefer a smaller, customizable harness. No harness plugin is needed.
 
@@ -24,7 +27,8 @@ first. The current free tier requires OpenCode 1.18.0 or newer. Use its default
 free model, or choose an available free model with `/models`. Free model availability changes. Use public examples for setup.
 
 Ask the agent to configure RAP + Kimi-K3 for OpenCode using your team's key.
-After configuration, restart OpenCode or select `nchc-rap/Kimi-K3` with `/models`.
+Follow the [OpenCode RAP handoff](../README.md#connect-rap-in-opencode) for
+key entry, restarting in the same environment, and the image-reading test.
 Use that endpoint for the remaining setup. Nano4 iService credentials are needed
 only when you move on to cluster jobs.
 
@@ -157,4 +161,4 @@ References: [OpenCode custom providers](https://opencode.ai/docs/providers/#cust
 [Pi custom models](https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/models.md),
 and [Pi settings](https://github.com/badlogic/pi-mono/blob/main/packages/coding-agent/docs/settings.md).
 
-[Continue in README: set up NCHC iService credentials](../README.md#2-set-up-nchc-iservice-credentials).
+[Continue in README: give the agent a suitable environment](../README.md#2-give-the-agent-a-suitable-environment).
