@@ -16,6 +16,13 @@
   incomplete. Other Markdown files are optional supplements for users and
   references for agents. Put detailed explanations and manual alternatives in
   `docs/`, ending guides with a link back to the relevant README section.
+- Present concepts, a demonstration, and observable success criteria. Keep
+  copyable prompts and make installation, cloning, restart, and authentication
+  handoffs explicit. Invite users to ask the agent about underlying commands.
+  Maintain one canonical copy of launch commands to prevent guide drift.
+- Check primary service documentation before describing a requirement or ban.
+  Distinguish published policy, repository recommendations, and script defaults.
+  Explain recommendations through resource limits, queue time, and cost.
 - Centralize credentials in `docs/nchc-iservice.md`. Keep machine passwords and
   OTPs out of chat. RAP keys may be given to the agent. Keep credentials out of
   Git and logs, store them privately, and reuse existing authentication.
@@ -23,6 +30,10 @@
   and validate the documented workflow before claiming it works.
 - Test documented commands. Keep detailed validation notes in ignored
   `artifacts/validation/<timestamp>.md`, and omit validation dates from guides.
+  Validate first-run flows in a fresh environment. For documentation moves,
+  compare commands with validated originals and check links and shell syntax.
+  Repeat live tests when behavior changes or unresolved failures justify them.
+  State what each check proves and its limits.
 
 ## Agent Environments
 
@@ -47,6 +58,18 @@
   container preparation and workloads. Release unused allocations. See
   `docs/agent-environments.md`.
 
+## Diagrams
+
+- Give each figure one purpose. Use short labels with natural phrases or actions,
+  direct connections, and visible execution or isolation boundaries. Show
+  optional containers explicitly and keep workloads inside their runtime.
+- Prefer numbered phases when a full architecture graph becomes hard to read.
+  Identify where actions run and where outputs go. Show one representative
+  resource and an ellipsis when drawing every resource adds clutter.
+- Render and visually inspect edited diagrams at the destination's actual width
+  and theme. Renderer versions and fonts can change layout. Mermaid subgraphs
+  with external node connections may ignore their requested direction.
+
 ## Writing Rules
 
 Avoid semicolons and spaced dashes in prose, including documentation, comments,
@@ -55,6 +78,10 @@ does not apply to code syntax, command options, or Markdown list markers.
 
 ## Commit Rules
 
+- Keep staged batches small and coherent, and inspect the staged diff. Make
+  commits self-contained with meaningful messages independent of unpublished
+  branches or conversation history. Preserve the requested order of committing
+  approved work and adding new suggestions.
 - End agent-created commit bodies with a plain `by <Harness> (<Model>)` line
   using the actual active harness and model. For Codex, use the full lowercase
   model slug. Verify the active model if unclear. This line is the only agent
