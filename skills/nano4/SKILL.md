@@ -35,9 +35,16 @@ in the user's own terminal. Rsync reuses the authenticated SSH master.
   distribution. Codex CLI's `!` runner does not provide the required terminal.
   After the user authenticates, verify with `check.sh` and `exec.sh hostname`.
 - Set `NCHC_REMOTE_DIR` to a fresh absolute directory for each new submission
-  and keep using it for status and downloads. Reuse that directory after a
+  and keep using it for preparation, submission, status, and downloads. Each
+  terminal tool call may start a new shell. An `export` in an earlier call does
+  not carry over. Prefix every invocation with `NCHC_REMOTE_DIR=/work/USER/RUN`
+  using the same concrete absolute path. The job scripts require it and stop
+  when it is missing. Reuse that directory after a
   connection failure. The `submission/` marker prevents duplicate submission.
   Inspect `squeue --me` and `sacct` before resolving an uncertain submission.
+  Follow `docs/nano4.md#submission-recovery`. Match the working directory before
+  restoring a missing job ID. Never remove the marker or resubmit while the
+  outcome is uncertain. After confirming rejection, use a fresh run directory.
 - Select an image URI, SIF filename, job script, and resource requests that fit
   the user's workload. Use `prepare-sif.sh IMAGE_URI SIF_NAME [SRUN_OPTIONS...]`, then
   `submit.sh JOB_SCRIPT [JOB_ARGS...]`. Use the smoke script only for a requested

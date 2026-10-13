@@ -111,6 +111,21 @@ Nano4 may disconnect it earlier. Already submitted Slurm jobs continue running.
 **Run these scripts locally. Apptainer itself runs only on Nano4, inside
 an allocated Slurm compute node. You do not need Apptainer or Docker locally.**
 
+**Use a fresh remote run directory for each new submission.** Repeating
+`submit.sh` in the same directory returns its existing job ID to prevent
+accidental duplicate jobs. In a single interactive terminal, export it once
+and keep using that terminal:
+
+```bash
+export NCHC_REMOTE_DIR="/work/YOUR_SUPERCOMPUTER_ACCOUNT/smoke-$(date +%Y%m%d-%H%M%S)"
+```
+
+Preparation, submission, status, and download scripts require this variable.
+Agent terminal tools may start a new shell for every call, so an earlier
+`export` is not enough. Prefix each call with the same concrete path, for example
+`NCHC_REMOTE_DIR=/work/YOUR_SUPERCOMPUTER_ACCOUNT/smoke-run-1 bash scripts/nano4/status.sh`.
+Use the path actually chosen for your run, not a new timestamp on every call.
+
 ```bash
 bash scripts/nano4/prepare-sif.sh docker://nvcr.io/nvidia/pytorch:26.09-py3 container.sif
 bash scripts/nano4/submit.sh cluster/nano4/smoke.slurm container.sif
@@ -118,29 +133,8 @@ bash scripts/nano4/submit.sh cluster/nano4/smoke.slurm container.sif
 
 The local [prepare-sif.sh](../scripts/nano4/prepare-sif.sh) uploads
 [remote/prepare-sif.sh](../scripts/nano4/remote/prepare-sif.sh), then executes it through
-`srun`. The remote script contains the container build commands and can also be
-run directly inside an existing compute allocation:
-
-```bash
-bash scripts/nano4/remote/prepare-sif.sh /work/YOUR_SUPERCOMPUTER_ACCOUNT/agentic-samples \
-  docker://nvcr.io/nvidia/pytorch:26.09-py3 container.sif
-```
-
-The example uses NGC PyTorch `26.09-py3`. You can supply any supported
-container URI and choose its SIF filename. For example:
-
-```bash
-bash scripts/nano4/prepare-sif.sh docker://ubuntu:24.04 ubuntu.sif
-```
-
-This hackathon focuses on H200. Use GB200 only when explicitly requested.
-
-Hackathon projects can use `dev`, `8gpus`, `16gpus`, `32gpus`, `64gpus`,
-and `gb200-dev`. Slurm dry-runs accepted all six at their maximum runtimes.
-Other visible partitions, including `gb200-r1`, `gb200-r2`, and CPU-only
-partitions, rejected the test project. See the
-[partition table](../skills/nano4/SKILL.md#choose-a-partition) for limits
-and selection guidance. GB200 needs ARM images and binaries.
+`srun`. The remote script contains the container build commands. If you already
+have a compute allocation, you can adapt those commands there.
 
 Preparation defaults to one H200 GPU allocation, 12 CPU cores, and 200G RAM
 in `dev` for up to four hours, its maximum job time. These CPU and memory
@@ -148,45 +142,16 @@ requests follow the
 [per-GPU partition limits](https://man.twcc.ai/@nano4-manual/SJM_FuxDWe).
 The container build uses CPU and memory. The GPU is reserved because Nano4's
 H200 partitions require a GPU allocation.
-For builds needing more time, use `--partition=8gpus --time=48:00:00`.
-
-Append standard `srun` options to increase resources when the build needs more.
-For example, double the allocation to two GPUs, 24 CPUs, and 400G RAM:
-
-```bash
-bash scripts/nano4/prepare-sif.sh docker://nvcr.io/nvidia/pytorch:26.09-py3 container.sif \
-  --gpus-per-node=2 --cpus-per-task=24 --mem=400G
-```
 
 Extraction, cache, and compression use `SLURM_TMPDIR` or `/dev/shm` on the compute
 node. The completed SIF is copied to `/work`, and temporary storage is cleaned.
 Repeated preparation reuses a SIF with the same recorded source. Choose another
 filename for a different image.
 
-`submit.sh` accepts any local Slurm script and passes subsequent arguments to it.
-To override its resource requests, use `submit.sh SBATCH_OPTIONS... -- JOB_SCRIPT
-[JOB_ARGS...]`.
-Put resource requests in that script, write logs under `logs/`, and save output
-artifacts under `outputs/`. The remote submission script creates both directories
-before submission.
-The example script runs `nvidia-smi` by default, or a command you supply:
-
-```bash
-bash scripts/nano4/submit.sh cluster/nano4/smoke.slurm ubuntu.sif cat /etc/os-release
-```
-
-Choose a command installed in your chosen image. For your own workload, replace
-`cluster/nano4/smoke.slurm` with your script and upload any inputs it needs.
-
-The default remote run directory is `/work/<username>/agentic-samples`.
-Set `NCHC_REMOTE_DIR` in your local shell for a different directory. **Use a
-fresh directory for each new submission.** Repeating `submit.sh` in the same
-directory returns the existing job ID to prevent accidental duplicate jobs.
-If submission is interrupted without a recorded ID, inspect Slurm before retrying.
-
-```bash
-export NCHC_REMOTE_DIR=/work/YOUR_SUPERCOMPUTER_ACCOUNT/my-next-run
-```
+The smoke script runs `nvidia-smi` and saves logs under `logs/`. The submission
+script creates `logs/` and `outputs/` before Slurm opens the job's output files.
+If submission fails without a recorded ID, follow
+[submission recovery](#submission-recovery) before trying again.
 
 Only scripts and selected results use the shared login connection. For large
 input or output transfers, Nano4's data-transfer service uses port 2222 and
@@ -225,5 +190,71 @@ When authentication expires, run `login.sh` again and resume. For Nano4 access
 issues, ask [#cluster-support](https://nchcopenhackathon2026.slack.com/archives/C0C749A0NTE). Ask your NVIDIA mentor for
 domain-specific workload questions. Check host driver compatibility before
 running actual PyTorch/CUDA workloads.
+
+## Submission recovery
+
+If `submission/` exists without `submission/job-id`, the script stops instead
+of risking a duplicate job. This can follow a rejected request or a lost
+response after Slurm accepted it. Keep the original directory and marker.
+Inspect the queue and accounting through the shared SSH connection:
+
+```bash
+bash scripts/nano4/exec.sh squeue --me --format='%.18i %.10T %.30j %Z'
+bash scripts/nano4/exec.sh sacct -X --starttime today --format=JobID,State,ExitCode,WorkDir%80
+```
+
+[squeue](https://slurm.schedmd.com/squeue.html) shows current jobs.
+[sacct](https://slurm.schedmd.com/sacct.html) also shows completed jobs.
+Match the working directory to your original `NCHC_REMOTE_DIR`. Replace
+`today` with a date before the attempt if it happened on an earlier day.
+Accounting can lag, so an empty result alone does not prove rejection.
+
+If a matching job exists, keep its ID and original run directory. Ask your
+agent to restore that verified ID in `submission/job-id`, then resume status
+and downloads. If the outcome remains uncertain, ask
+[#cluster-support](https://nchcopenhackathon2026.slack.com/archives/C0C749A0NTE)
+before submitting again.
+
+After confirming no job was accepted, correct the rejected request and choose
+a fresh `NCHC_REMOTE_DIR` as in step 3. Prepare the image and submit there.
+Keep the old marker for inspection.
+
+## Other images and resources
+
+These are alternatives to the main smoke test, not its next steps. Each new
+job needs a fresh run directory. For example, prepare Ubuntu and print its
+release information instead of running `nvidia-smi`:
+
+```bash
+export NCHC_REMOTE_DIR="/work/YOUR_SUPERCOMPUTER_ACCOUNT/ubuntu-$(date +%Y%m%d-%H%M%S)"
+bash scripts/nano4/prepare-sif.sh docker://ubuntu:24.04 ubuntu.sif
+bash scripts/nano4/submit.sh cluster/nano4/smoke.slurm ubuntu.sif cat /etc/os-release
+bash scripts/nano4/status.sh
+```
+
+`submit.sh` accepts any local Slurm script and passes subsequent arguments to it.
+Choose a command installed in your image. For your own workload, replace
+`cluster/nano4/smoke.slurm` with your script and upload any inputs it needs.
+Put resource requests in that script, write logs under `logs/`, and save output
+artifacts under `outputs/`.
+To override resource requests, use `submit.sh SBATCH_OPTIONS... -- JOB_SCRIPT
+[JOB_ARGS...]`.
+
+This hackathon focuses on H200. Use GB200 only when explicitly requested.
+Hackathon projects can use `dev`, `8gpus`, `16gpus`, `32gpus`, `64gpus`,
+and `gb200-dev`. Slurm dry-runs accepted all six at their maximum runtimes.
+Other visible partitions, including `gb200-r1`, `gb200-r2`, and CPU-only
+partitions, rejected the test project. See the
+[partition table](../skills/nano4/SKILL.md#choose-a-partition) for limits
+and selection guidance. GB200 needs ARM images and binaries.
+
+For builds needing more than four hours, use `--partition=8gpus --time=48:00:00`.
+Append standard `srun` options to increase resources when the build needs more.
+For example, in a fresh run directory, allocate two GPUs, 24 CPUs, and 400G RAM:
+
+```bash
+bash scripts/nano4/prepare-sif.sh docker://nvcr.io/nvidia/pytorch:26.09-py3 container.sif \
+  --gpus-per-node=2 --cpus-per-task=24 --mem=400G
+```
 
 [Return to README: run jobs on Nano4](../README.md#3-run-jobs-on-nano4).

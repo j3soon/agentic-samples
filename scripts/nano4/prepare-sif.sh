@@ -4,6 +4,7 @@
 set -euo pipefail
 if [[ ${1:-} == --help || ${1:-} == -h ]]; then
   echo 'Usage: bash scripts/nano4/prepare-sif.sh IMAGE_URI SIF_NAME [SRUN_OPTIONS...]'
+  echo 'Set NCHC_REMOTE_DIR to the run directory for every invocation.'
   exit 0
 fi
 if [[ $# -lt 2 || ! $2 =~ ^[a-zA-Z0-9_.-]+\.sif$ ]]; then
@@ -16,6 +17,7 @@ shift 2
 
 # Shared account parsing and SSH options stay in one readable helper.
 source "$(dirname "${BASH_SOURCE[0]}")/helpers/ssh.sh"
+require_run_directory
 require_connection
 account=$(printf '%s' "$project_code" | tr '[:upper:]' '[:lower:]')
 printf -v remote_command 'mkdir -p %q' "$remote_dir"

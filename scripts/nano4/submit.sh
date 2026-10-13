@@ -4,6 +4,7 @@
 set -euo pipefail
 if [[ ${1:-} == --help || ${1:-} == -h ]]; then
   echo 'Usage: bash scripts/nano4/submit.sh [SBATCH_OPTIONS... --] JOB_SCRIPT [JOB_ARGS...]'
+  echo 'Set NCHC_REMOTE_DIR to the run directory for every invocation.'
   exit 0
 fi
 # Optional Slurm flags precede --. Keep the original script-first usage valid.
@@ -28,6 +29,7 @@ shift
 
 # Shared account parsing and SSH options stay in one readable helper.
 source "$(dirname "${BASH_SOURCE[0]}")/helpers/ssh.sh"
+require_run_directory
 require_connection
 
 # Create the run directory and upload the two scripts through shared SSH.

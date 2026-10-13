@@ -78,7 +78,7 @@ New users can skip this step. See [docs/nano4.md](docs/nano4.md).
 
 Ask your agent:
 
-> Submit the Nano4 container smoke test and download its logs.
+> Submit the Nano4 container smoke test in a fresh remote run directory and download its logs.
 
 The agent handles setup, submission, and result collection. It prompts you to
 run the login command in your own terminal when authentication is needed:

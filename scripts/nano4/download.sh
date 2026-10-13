@@ -4,10 +4,12 @@
 set -euo pipefail
 if [[ ${1:-} == --help || ${1:-} == -h ]]; then
   echo 'Usage: bash scripts/nano4/download.sh [RELATIVE_PATHS...]'
+  echo 'Set NCHC_REMOTE_DIR to the run directory for every invocation.'
   exit 0
 fi
 # Shared account parsing and SSH options stay in one readable helper.
 source "$(dirname "${BASH_SOURCE[0]}")/helpers/ssh.sh"
+require_run_directory
 require_connection
 
 # Download selected paths through the authenticated connection.

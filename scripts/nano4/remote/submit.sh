@@ -26,6 +26,7 @@ fi
 # A durable marker prevents automatic duplicate submission after a lost response.
 if ! mkdir submission; then
   echo 'Submission outcome is uncertain. Inspect squeue/sacct before retrying.' >&2
+  echo 'See docs/nano4.md#submission-recovery in your local checkout.' >&2
   exit 3
 fi
 mkdir -p logs outputs
@@ -36,11 +37,13 @@ if job_id=$(sbatch --account="$account" "${sbatch_options[@]}" job.slurm "$@"); 
   job_id=${job_id%%;*}
   if [[ ! "$job_id" =~ ^[0-9]+$ ]]; then
     echo 'Unexpected sbatch response. Inspect Slurm before retrying.' >&2
+    echo 'See docs/nano4.md#submission-recovery in your local checkout.' >&2
     exit 3
   fi
   printf '%s\n' "$job_id" > submission/job-id
   echo "Submitted job $job_id"
 else
   echo 'Submission failed. Inspect Slurm and the submission marker before retrying.' >&2
+  echo 'See docs/nano4.md#submission-recovery in your local checkout.' >&2
   exit 3
 fi

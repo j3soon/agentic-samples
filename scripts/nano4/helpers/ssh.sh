@@ -49,3 +49,11 @@ require_connection() {
   # Rsync accepts an SSH command string. Quote the socket path for spaces.
   rsync_ssh="ssh -p 22 -o \"ControlPath=$control_dir/%C\" -o BatchMode=yes -o ControlMaster=no -o ConnectTimeout=15"
 }
+
+require_run_directory() {
+  if [[ -z ${NCHC_REMOTE_DIR:-} ]]; then
+    echo 'Set NCHC_REMOTE_DIR for this command. Use a fresh directory for a new job.' >&2
+    echo 'Reuse the same directory for retries, status, and downloads.' >&2
+    exit 2
+  fi
+}
