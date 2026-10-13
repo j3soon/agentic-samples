@@ -37,10 +37,12 @@ Preparation uploads `remote/prepare-sif.sh` and runs it through Slurm.
 
 ## Agent workflow
 
-Choose a host that supports YOLO or all-permissions mode using
-[agent-environments.md](agent-environments.md). Run a
-persistent cluster-hosted agent in a Slurm allocation. On a compute node, use
-Slurm commands directly. The SSH scripts below are for an agent outside Nano4.
+Choose a local host, Docker container, or dedicated VM that supports YOLO or
+all-permissions mode using [agent-environments.md](agent-environments.md).
+Do not run agents on Nano4 login (head) nodes. Compute nodes can host them
+within Slurm allocations, but H200 jobs require at least one GPU and consume
+budget, so local execution is generally preferable. The SSH scripts below let
+the local agent prepare containers and submit workloads remotely.
 
 Start a local agent session in this repository and ask:
 
@@ -180,6 +182,21 @@ bash scripts/nano4/download.sh logs outputs/my-model.pt
 The smoke test passes when its downloaded log shows an H200 GPU and Slurm
 reports `COMPLETED` with exit code `0:0`. This checks GPU visibility, not PyTorch
 operations. Run status queries manually. Nano4 discourages frequent polling.
+
+#### Cancel an unwanted job
+
+Closing your agent, container, or SSH connection does not cancel submitted jobs.
+To release an unwanted allocation or remove a pending job, replace `JOB_ID`
+with the numeric ID reported by submission:
+
+```bash
+bash scripts/nano4/exec.sh scancel JOB_ID
+bash scripts/nano4/status.sh
+```
+
+The [scancel command](https://slurm.schedmd.com/scancel.html) requests cancellation.
+Check status afterward to confirm the job has stopped and its allocation is
+released. Keep `NCHC_REMOTE_DIR` set to that job's directory for `status.sh`.
 
 ```bash
 bash scripts/nano4/exec.sh hostname  # Optional remote command.

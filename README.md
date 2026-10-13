@@ -27,8 +27,8 @@ Use Ubuntu, macOS, or Windows with WSL2, with Bash, OpenSSH, and rsync 3+.
 
 **Prerequisite:** use an environment where you can enable YOLO or all-permissions
 mode. A personal computer is fine if you accept the agent's access to files and
-credentials. Containers, dedicated VMs, and Nano4 compute allocations are also
-options.
+credentials. Containers and dedicated VMs are also options. Keep the agent local
+and use Nano4 allocations for container preparation and workloads.
 
 Use OpenCode by default, with Pi as the secondary option for users who prefer
 minimalism and customizability. Approval prompts suit sensitive environments
@@ -60,9 +60,10 @@ channel. Ask your agent:
 
 > Configure RAP with Kimi-K3 for OpenCode, preserving existing settings and permissions, then test image reading.
 
-Continue with **RAP + Kimi-K3** for the remaining setup. Use RAP freely during
-the hackathon. The event quota is intended to be effectively unlimited for normal
-team use, though service rate limits still apply. Pi is the secondary option.
+Continue with **RAP + Kimi-K3** for event work.
+Each team starts with a **NT$20,000 RAP budget**. If you exceed it or need more,
+contact your mentor. Additional budget can be requested up to **NT$40,000**.
+Service rate limits still apply. Pi is the secondary option.
 See [docs/rap.md](docs/rap.md) for manual steps and privacy guidance.
 
 ## 2. Set up NCHC iService credentials
@@ -73,6 +74,44 @@ SSH credentials and project access. The agent can guide you, but website setting
 machine passwords, and OTP entry stay in your hands.
 
 ## 3. Run jobs on Nano4
+
+Run the agent **locally**, on your computer, in Docker, or in a dedicated VM.
+It connects to Nano4 over SSH. The **login node** handles
+short setup, file operations, and job management. **Slurm** allocates compute
+nodes for container preparation and GPU workloads.
+Nano4's [usage rules](https://man.twcc.ai/@nano4-manual/B1zWMYxv-l)
+require computational work to go through Slurm.
+
+**Do not run agents on Nano4 login (head) nodes.** These nodes are for short
+setup, file operations, and job management.
+
+Running an agent on a compute node is technically feasible within a Slurm
+allocation, but H200 compute jobs require at least one GPU. You spend GPU budget
+even while the agent waits for a model response. We generally recommend local
+execution and reserving cluster allocations for container preparation and
+workloads. [Cancel unwanted jobs](docs/nano4.md#cancel-an-unwanted-job)
+to release their allocations. Closing the agent does not cancel submitted jobs.
+
+### Compute and RAP budgets
+
+| Service | Budget applies to | Default budget | Maximum with an approved request |
+|---|---|---:|---:|
+| Nano4 H200 GPU + Forerunner-1 Grace CPU | Each service account, shared across both clusters | NT$5,000 | NT$20,000 |
+| RAP model API | Each team | NT$20,000 | NT$40,000 |
+
+Contact your mentor if you exceed your budget or need an increase.
+This repository's workload example uses Nano4. See the
+[Nano4 partition guide](https://man.twcc.ai/@nano4-manual/SJM_FuxDWe) and
+[Forerunner-1 partition guide](https://man.twcc.ai/@f1-manual/partition)
+for resource limits.
+
+NCHC's [pricing guide](https://iservice.nchc.org.tw/nchc_service/nchc_service_qa.php?target=54)
+lists **NT$60 per H200 GPU-hour** for government and academic projects.
+At that rate, one GPU for one hour costs NT$60, and a full eight-GPU node costs
+**NT$480 per hour**. Estimate compute cost as allocated GPUs × running hours ×
+NT$60. Container preparation also uses a paid compute allocation.
+
+### Demo: submit a container smoke test
 
 If you have used Nano4 before, back up existing files you want to keep first.
 New users can skip this step. See [docs/nano4.md](docs/nano4.md).

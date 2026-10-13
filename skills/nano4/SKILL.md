@@ -17,11 +17,15 @@ in the user's own terminal. Rsync reuses the authenticated SSH master.
   to keep. New users can skip this step. Treat Nano4 as non-sensitive, with
   OpenCode as the default agent. YOLO or all-permissions mode is a prerequisite.
   The user chooses the mode, and scripts do not change permissions automatically.
-- For a cluster-hosted agent, follow `docs/agent-environments.md`. Run the agent
-  in a Slurm allocation. A long-running H200 agent uses `8gpus` with one GPU,
-  two CPU cores, and 8 GB RAM, for up to 48 hours. Choose workload partitions
-  using the limits and current load below. Use direct Slurm commands from
-  compute nodes rather than adding an SSH hop, and submit workloads with `sbatch`.
+- Default to running the agent locally, on the host, in Docker, or in a
+  dedicated VM. Do not run agents on Nano4 login (head) nodes. Compute nodes
+  can host agents within Slurm allocations, but H200 jobs require at least one
+  GPU and consume budget even while waiting for model responses. Generally
+  avoid this. If explicitly requested, run the agent only within an allocated
+  compute job. Use the SSH scripts for local agents to prepare containers and
+  submit workloads. Release unused allocations. Choose workload
+  partitions using the limits and current load below. See
+  `docs/agent-environments.md` and the budget guidance in README.
 - Handle setup and jobs with the standalone scripts. When the user must change account
   website settings or run a command manually, explain why and give the exact
   steps or command. Resume after they confirm completion. Never ask them to
@@ -67,6 +71,8 @@ in the user's own terminal. Rsync reuses the authenticated SSH master.
 - `exec.sh COMMAND...` runs remote commands. Use `exec.sh bash -lc '...'` for shell
   syntax. `logout.sh` closes the shared connection. Otherwise it has no local
   idle expiration, but the server, network, or local machine may disconnect it.
+  Closing the agent or connection does not stop submitted jobs. When requested,
+  cancel the specific job with `exec.sh scancel JOB_ID` and check its status.
   Submit only jobs within the user's requested scope.
 
 ## Choose a partition
@@ -105,7 +111,7 @@ The GB200 production partitions keep jobs within one rack.
   use `sbatch --test-only` with the actual account, resources, and time limit for
   the candidate partitions. Estimates can change and do not guarantee a start.
 - Prefer `dev` for short H200 setup and tests when its wait is suitable.
-  A one-GPU H200 agent needing more than four hours uses `8gpus`. Do not request
+  A one-GPU workload needing more than four hours can use `8gpus`. Do not request
   extra GPUs or shorten the required runtime just to enter a less busy queue.
 - Pass the chosen partition and resources through the scripts' Slurm options.
   Explain the choice briefly. Avoid frequent scheduler polling.

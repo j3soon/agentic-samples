@@ -37,8 +37,12 @@
   exit, and the exact restart command that reuses the same environment.
 - Treat Nano4 as non-sensitive. Ask returning users to back up existing files
   before initial agent setup. New users can skip this step.
-- Run persistent cluster agents in Slurm allocations, not on login nodes.
-  Use direct Slurm commands when already on Nano4. See `docs/agent-environments.md`.
+- Default to running the agent locally, on the host, in Docker, or in a
+  dedicated VM. Do not run agents on Nano4 login (head) nodes. Compute nodes
+  can host agents within Slurm allocations, but H200 jobs require at least one
+  GPU and consume budget. Generally avoid this and reserve allocations for
+  container preparation and workloads. Release unused allocations. See
+  `docs/agent-environments.md`.
 
 ## Writing Rules
 
