@@ -114,7 +114,7 @@ opencode --auto
 
 Use an available free model, selecting one with `/models` if needed. Ask:
 
-> Check Git, OpenSSH, and rsync 3+ in this environment and install missing tools. Then clone https://github.com/j3soon/agentic-samples.git into the current directory (`.`).
+> Clone https://github.com/j3soon/agentic-samples.git into `.`. Check Git, OpenSSH, and rsync 3+, installing missing tools.
 
 Enter any administrator password only in your own terminal.
 
@@ -128,7 +128,7 @@ Follow this handoff in your chosen host, VM, or Docker session.
 Your mentor shares your team's pre-created RAP API key in your team Slack
 channel. Ask:
 
-> Configure RAP with Kimi-K3 for OpenCode, preserving existing settings and permissions, then test image reading.
+> Set up OpenCode with RAP + Kimi-K3 and test image reading.
 
 The agent can configure the provider before you have entered its key, but the
 image test needs authentication. When it asks for the key, enter it locally
@@ -146,7 +146,7 @@ Exit with `/exit` and restart in the same environment to refresh provider settin
 
 Select `nchc-rap/Kimi-K3` with `/models`. In the RAP session, ask:
 
-> I entered the RAP key locally. Run the image-reading test and report the requested model and result. Do not read or print credential files.
+> RAP is connected. Test image reading.
 
 Continue with **RAP + Kimi-K3** for event work.
 Each team starts with a **NT$20,000 RAP budget**. If you exceed it or need more,
@@ -217,7 +217,7 @@ on your machine first. You do not need Docker inside the agent container.
 
 If you already have an agent and a clone, ask:
 
-> Build docker/opencode/Dockerfile as the opencode image with my host UID, pulling the latest base and rebuilding without cache. Give me the interactive launch command shown in README.md, mounting this repository and ~/docker/opencode as its private home.
+> Build the OpenCode Docker image and show me the README launch command.
 
 If you are starting with Docker and have no clone or agent yet, run this in
 your host terminal instead:
@@ -296,7 +296,7 @@ or give the rotatable key to the agent to store privately. Reuse existing
 authentication if available. The configuration selects RAP + Kimi-K3 by default.
 Ask:
 
-> Run bash scripts/rap/test-pi.sh and report the requested model and image-reading result. Do not read or print credential files.
+> Test RAP image reading in Pi.
 
 Continue to Nano4 below from this Pi session. Exit Pi and its shell when done.
 To update, rerun the build and launch commands with the same mounts.
@@ -358,7 +358,7 @@ and enable more parallel build work. Nano4 lists compilation and building among
 
 Ask your agent:
 
-> Help me package my workload's dependencies as a custom SIF for Nano4. Explain whether to use a Dockerfile and registry or an Apptainer definition file, and keep the build recipe in this repository.
+> Package my workload as a SIF for Nano4. Keep its build recipe.
 
 **Do not run agents on Nano4 login (head) nodes.** These nodes are for short
 setup, file operations, and job management.
@@ -403,7 +403,7 @@ New users can skip this backup step.
 
 In your chosen agent session, ask:
 
-> Check that this environment has Bash, OpenSSH, and rsync 3+, installing missing tools if needed. Submit the Nano4 container smoke test in a fresh remote run directory and download its logs. Report the job ID, remote run directory, completion status, and local result paths.
+> Run the Nano4 single-GPU access check and download its logs.
 
 The agent configures your account identifiers, prepares the image on allocated
 compute resources, submits the job, and collects results. When it requests
@@ -420,13 +420,14 @@ Docker shells start in `/workspace`. Run this in the chosen terminal:
 bash scripts/nano4/login.sh
 ```
 
-At login, choose **1 (Mobile APP OTP)**, enter your Supercomputer machine
-password (not the iService website password), then the current phone OTP.
+At login, choose **2 (Mobile APP PUSH)**, enter your Supercomputer machine
+password (not the iService website password), then approve the request on
+your phone.
 Keep them out of chat. A successful login reports `Master running (pid=...)`.
 
 After login succeeds, tell the agent:
 
-> I am connected in the same environment. Resume the smoke test using the run directory already chosen, or choose a fresh one if none exists. Wait for completion and download the logs.
+> Nano4 is connected. Resume the GPU check.
 
 The agent reuses that SSH connection. A login on your host cannot automatically
 authenticate an agent inside a separate container or VM.
@@ -443,11 +444,11 @@ accounting before retrying. This avoids accidentally submitting twice.
 
 Ask your agent:
 
-> Check Nano4 job JOB_ID using its recorded run directory. Report its state and download any available logs.
+> Check Nano4 job JOB_ID and download its logs.
 
 To stop an unwanted job, replace `JOB_ID` with its numeric ID and ask:
 
-> Cancel Nano4 job JOB_ID and verify that its allocation is released.
+> Cancel Nano4 job JOB_ID and check the remaining jobs.
 
 You can also cancel it directly in the same environment, from the repository:
 
@@ -466,7 +467,7 @@ Once the smoke test works, give the agent a workload and measurable goal:
 
 If you want to understand the underlying commands, ask your agent directly:
 
-> Explain the commands you used for this workflow, why each step is needed, and where I can find them in this repository.
+> Explain the commands you used and where to find them.
 
 The walkthrough above is sufficient for getting started. Read these when you
 want more detail or manual alternatives:
