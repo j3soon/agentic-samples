@@ -56,10 +56,10 @@ from the model/settings files that the setup scripts configure.
 
 For manual entry, use your client's local prompt after configuring the provider:
 
-- **OpenCode:** start `opencode`, run `/connect`, choose **Other**, and enter
+- **OpenCode:** start `opencode --auto`, run `/connect`, choose **Other**, and enter
   provider ID `nchc-rap`, then your API key. It is stored in
   `~/.local/share/opencode/auth.json`.
-- **Pi:** start `pi`, run `/login`, choose **API key**, and select **NCHC RAP**.
+- **Pi:** start `pi --approve`, run `/login`, choose **API key**, and select **NCHC RAP**.
   Enter your key. Pi stores it in `~/.pi/agent/auth.json`.
 
 If the client is already authenticated, skip entry and run the response test.

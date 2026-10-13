@@ -11,21 +11,63 @@ extensibility through skills, extensions, prompt templates, and themes. This is
 our recommended audience for Pi's smaller core and customization options.
 No extra Pi package or harness plugin is needed for these examples.
 
+## Install OpenCode on Ubuntu
+
+Start here on a fresh Ubuntu host or Ubuntu in WSL2. Install the tools before
+asking the agent to clone the repository or access Nano4. In a root container,
+omit `sudo` from the first two commands:
+
+```bash
+sudo apt-get update
+sudo apt-get install -y --no-install-recommends \
+  ca-certificates curl unzip git openssh-client rsync
+curl -fsSL https://opencode.ai/install -o /tmp/opencode-install.sh && bash /tmp/opencode-install.sh
+export PATH="$HOME/.opencode/bin:$PATH"
+opencode --version
+```
+
+These use the [official installer](https://opencode.ai/docs/#install).
+The explicit `export` makes the binary available immediately, including when
+the installer finds no existing shell profile. Follow its profile instructions
+to keep the command available in later terminals. Downloading the installer
+before running it makes a failed download visible. If OpenCode is already
+installed, update it with `opencode upgrade`.
+
+If you already have Node.js and npm, the official npm installation is another
+option:
+
+```bash
+npm install -g opencode-ai
+opencode --version
+```
+
+Then [start OpenCode from this repository](../README.md#1-set-up-a-local-agent-and-rap).
+Docker users can instead follow the
+[container launch commands](#launch-opencode-or-pi-in-docker) below.
+
 ## Launch the agent
 
 Enable YOLO or all-permissions mode in your chosen environment. No repository
-script selects these modes automatically:
+script selects these modes automatically. Choose one client.
+
+**OpenCode (default):**
 
 ```bash
-codex --yolo
-claude --dangerously-skip-permissions
 opencode --auto
-pi
 ```
 
+**Pi (secondary option):**
+
+```bash
+pi --approve
+```
+
+If you already use Codex, launch with `codex --yolo`. For Claude Code, use
+`claude --dangerously-skip-permissions`.
 Codex and Claude Code skip permission prompts in these modes. Codex also disables
 its sandbox. OpenCode calls this mode `--auto` and still respects explicit deny
-rules. Pi needs no extra flag for tool execution. See
+rules. Pi runs tools without per-call approvals. `--approve` trusts project
+resources for this session and skips the initial project trust prompt. See
 [Codex CLI](https://developers.openai.com/codex/cli/reference),
 [Claude Code CLI](https://code.claude.com/docs/en/cli-reference),
 [OpenCode permissions](https://opencode.ai/docs/permissions/), and
@@ -52,17 +94,92 @@ efficient.
 
 ## 2. Container on a personal computer
 
-For this workflow, assume the container is safely isolated when `/.dockerenv`
-exists. Use OpenCode by default, with Pi as a secondary option.
-
-```bash
-if [[ -f /.dockerenv ]]; then
-  echo 'Safely isolated container environment.'
-fi
-```
+Use a container to give the agent a dedicated workspace and its own settings.
+The launch commands below mount only the repository and a separate private home.
+Files in these mounts remain writable by the agent and survive container removal.
+Keep unrelated personal files outside the mounts. Do not mount your whole home
+or the Docker socket into the agent container.
 
 The user chooses the harness and permission mode. No repository script
-automatically disables approvals.
+automatically disables approvals. A container still sends model requests to the
+selected provider, so choose its data policy separately.
+
+### Launch OpenCode or Pi in Docker
+
+If you are starting with Docker and have not cloned the repository yet, clone
+it from your terminal first:
+
+```bash
+git clone https://github.com/j3soon/agentic-samples.git ~/nchc-hackathon
+cd ~/nchc-hackathon
+```
+
+After cloning the repository, run these commands from its root on Linux,
+macOS, or Windows through WSL2.
+Install [Docker](https://docs.docker.com/get-started/get-docker/) first.
+Each image contains one agent and the tools for this repository.
+Build with your host UID so SSH can identify the container user.
+Mount the project and a separate private home to keep settings, credentials,
+and sessions between runs.
+
+**OpenCode:** [Dockerfile](../docker/opencode/Dockerfile), based on the
+[official OpenCode Docker image](https://opencode.ai/docs/#install).
+
+```bash
+docker build --pull --no-cache --build-arg USER_UID="$(id -u)" -t opencode docker/opencode
+mkdir -p "$HOME/docker/opencode"
+chmod 700 "$HOME/docker/opencode"
+docker run --rm -it --init --name opencode \
+  --user "$(id -u):$(id -g)" \
+  --mount "type=bind,src=$PWD,dst=/workspace" \
+  --mount "type=bind,src=$HOME/docker/opencode,dst=/home/agent" \
+  opencode --auto
+```
+
+OpenCode starts in `/workspace` with the repository's instructions. Use an
+available free model for setup, then follow
+[manual RAP setup](rap.md#manual-setup) for key entry,
+restart, and the image-reading test before continuing to Nano4.
+
+**Pi:** [Dockerfile](../docker/pi/Dockerfile), following
+[Pi's plain Docker guide](https://pi.dev/docs/latest/containerization#run-pi-in-plain-docker).
+
+```bash
+docker build --pull --no-cache --build-arg USER_UID="$(id -u)" -t pi docker/pi
+mkdir -p "$HOME/docker/pi"
+chmod 700 "$HOME/docker/pi"
+docker run --rm -it --init --name pi --entrypoint bash \
+  --user "$(id -u):$(id -g)" \
+  --mount "type=bind,src=$PWD,dst=/workspace" \
+  --mount "type=bind,src=$HOME/docker/pi,dst=/home/node" \
+  pi
+```
+
+In the Pi container shell, follow [manual RAP setup](rap.md#manual-setup),
+then launch `pi --approve` and enter your key through `/login` if needed.
+`--approve` trusts project resources for this session. Each container home
+starts with separate credentials from your host agent.
+
+For setup commands or Nano4 login, open a second terminal in the same container:
+
+```bash
+docker exec -it opencode bash
+# For Pi instead: docker exec -it pi bash
+```
+
+Run `bash scripts/nano4/login.sh` there when the agent requests authentication.
+Keep the container running while the agent works. Stopping it closes its SSH
+connection, while submitted Slurm jobs continue. Closing the container does not
+cancel cluster jobs.
+OpenCode uses the official
+`latest` image, and Pi installs the current release when built. Update them by
+rebuilding. `--pull` refreshes the base images. `--no-cache` reruns installation
+steps so Pi picks up the newest package:
+
+```bash
+docker build --pull --no-cache --build-arg USER_UID="$(id -u)" -t opencode docker/opencode
+docker build --pull --no-cache --build-arg USER_UID="$(id -u)" -t pi docker/pi
+```
 
 ## 3. Dedicated VM or disposable machine
 

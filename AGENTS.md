@@ -32,6 +32,9 @@
 - Provider setup must preserve custom settings and explicit deny rules.
   Use a controlled merge, or leave custom files unchanged for the agent to
   merge. A backup alone does not preserve active permissions.
+- Identify the execution and authentication environment for each handoff.
+  Explain which settings persist through mounts, which connections close on
+  exit, and the exact restart command that reuses the same environment.
 - Treat Nano4 as non-sensitive. Ask returning users to back up existing files
   before initial agent setup. New users can skip this step.
 - Run persistent cluster agents in Slurm allocations, not on login nodes.

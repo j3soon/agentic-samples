@@ -34,6 +34,10 @@ in the user's own terminal. Rsync reuses the authenticated SSH master.
   same OS user and environment as the agent. On Windows use the same WSL
   distribution. Codex CLI's `!` runner does not provide the required terminal.
   After the user authenticates, verify with `check.sh` and `exec.sh hostname`.
+  In a container, use a second shell in that same container. Persisted private
+  homes retain credentials and settings, but recreating a container closes its
+  live SSH connection. Check the shared connection after a restart and request
+  login only when needed.
 - Set `NCHC_REMOTE_DIR` to a fresh absolute directory for each new submission
   and keep using it for preparation, submission, status, and downloads. Each
   terminal tool call may start a new shell. An `export` in an earlier call does

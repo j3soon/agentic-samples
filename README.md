@@ -33,7 +33,8 @@ options.
 Use OpenCode by default, with Pi as the secondary option for users who prefer
 minimalism and customizability. Approval prompts suit sensitive environments
 but make this workflow much less efficient.
-See [docs/agent-environments.md](docs/agent-environments.md) for launch commands.
+See [docs/agent-environments.md](docs/agent-environments.md) for launch commands,
+including [OpenCode and Pi in Docker](docs/agent-environments.md#launch-opencode-or-pi-in-docker).
 Keep persistent agents off cluster login nodes.
 
 ## 1. Set up a local agent and RAP
