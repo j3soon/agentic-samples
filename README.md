@@ -500,12 +500,46 @@ targeting 10 to 30 seconds and under one minute including warmup. The two-minute
 Slurm limit allows startup and cleanup. Queue waits, downloads, and agent
 responses take additional time.
 
-Ask your agent:
+### Demo: run, explain, and rerun
 
-> Run the recorded initial PyTorch weak scaling experiment on Nano4.
+Start with the provided implementation, which reproduces a CPU allocation
+issue encountered in an earlier experiment. The [preparation script](scripts/demos/prepare-scaling.sh)
+copies the initial version and tools into a fresh workspace, excluding the
+optimized version, reference results, and Git history. Ask your current agent:
 
-**Look for:** completed jobs at all four GPU counts, verified model checkpoints,
-and a training-time and efficiency plot.
+> Prepare a clean scaling demo in ~/nchc-scaling-demo, reusing the SIF from step 3.
+
+Exit the agent. If using Docker, stop and remove its container as in step 2
+to change mounts. In your host terminal, select the workspace and a fresh
+private home, then use step 2's Docker launch command:
+
+```bash
+cd ~/nchc-scaling-demo
+export OPENCODE_PRIVATE_HOME="$HOME/docker/opencode-scaling"
+```
+
+Connect **RAP + Kimi-K3** using step 1 and authenticate Nano4 using step 3 in
+this container. Return with step 2's `docker exec` command to reuse settings
+and SSH. Stopping the container closes its SSH connection.
+
+Ask:
+
+> Run the provided PyTorch scaling experiment.
+
+**Look for:** four completed jobs, downloaded logs and verified checkpoints,
+and a weak scaling plot. Submit the GPU configurations independently so Slurm
+can run them in parallel. The [task brief](examples/pytorch-scaling/TASK.md) keeps
+the workload fixed and asks the agent to preserve the baseline.
+
+Then ask:
+
+> Why is scaling bad? Fix it and rerun.
+
+**Look for:** an explanation of the CPU bottleneck, a second sweep with more
+CPUs, and a comparison of timings and losses. The agent reports remaining
+jobs and updates the tracked [node exclusions](cluster/nano4/excluded-nodes.txt)
+when it encounters node failures. If SSH disconnects, repeat step 3's login
+handoff and tell the agent to resume.
 
 ### Reference experiment
 

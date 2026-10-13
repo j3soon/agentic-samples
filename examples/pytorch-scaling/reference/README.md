@@ -11,7 +11,9 @@ Both use weak scaling with fixed work per GPU and one short measured interval.
 - [Plotter](plot.py): checks matching workloads and verified checkpoints,
   then writes PNG, SVG, and CSV.
 
-This models an actual earlier issue where eight GPU workers shared eight
+The prepared demo receives only the initial version and plotting tools.
+The agent measures the baseline, explains poor scaling, and reruns with more
+CPUs. This models an actual earlier issue where eight GPU workers shared eight
 CPU cores. The workload stays identical in both sweeps.
 
 See the [reference guide](../../../docs/pytorch-scaling.md) for manual commands

@@ -274,7 +274,8 @@ failure, retry in a fresh directory on other nodes. Limit placement retries to
 two before reporting the unresolved problem. Keep each entry until a targeted
 check or administrator confirmation resolves it. If healthy capacity is
 unavailable, consider a short check of one suspect before using it again.
-A busy queue alone does not establish recovery.
+A busy queue alone does not establish recovery. The demo preparation script
+copies both records into the new workspace.
 
 After cluster actions, end the turn with `bash scripts/nano4/exec.sh squeue --me`
 and report all remaining running/pending jobs and unresolved suspected nodes.
