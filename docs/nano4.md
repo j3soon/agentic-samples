@@ -165,6 +165,12 @@ requires separate authentication. If a runtime needs a site module, load it in
 the preparation or job script. The submission script uses the lowercase Slurm account form
 of your iService Project system code.
 
+Definition-file builds can use [fakeroot](https://apptainer.org/docs/user/latest/fakeroot.html).
+On Nano4, a root-mapped build failed to read a recipe under private `/work`
+directories. Stage the recipe and its inputs in node-local storage inside the
+Slurm task before building. Create scratch there, since login-node `/dev/shm`
+is separate from compute-node `/dev/shm`.
+
 ### 4. Check and download results
 
 ```bash

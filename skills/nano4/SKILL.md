@@ -53,6 +53,8 @@ in the user's own terminal. Rsync reuses the authenticated SSH master.
   using the same concrete absolute path. The job scripts require it and stop
   when it is missing. Reuse that directory after a
   connection failure. The `submission/` marker prevents duplicate submission.
+  For a new run, reuse the SIF's absolute path in a fresh submission directory.
+  Reusing a submitted directory only refers to its existing job.
   Inspect `squeue --me` and `sacct` before resolving an uncertain submission.
   Follow `docs/nano4.md#submission-recovery`. Match the working directory before
   restoring a missing job ID. Never remove the marker or resubmit while the
@@ -94,6 +96,9 @@ in the user's own terminal. Rsync reuses the authenticated SSH master.
   choosing a definition-file build on a local or cluster machine.
   Choose a different SIF name if an existing name has another source. If a
   runtime needs a site module, inspect and load it in the remote scripts.
+  For definition-file builds, stage the recipe and its inputs in node-local
+  scratch inside the Slurm task. Root-mapped builds may fail to read private
+  `/work` paths. Login-node scratch is separate from compute-node scratch.
 - Report the job ID. Use `status.sh` for explicit requests or bounded checks, not
   tight polling. Use `download.sh [RELATIVE_PATHS...]` to download logs and artifacts
   into ignored `results/<job-id>/`. Inspect exit codes and downloaded output
