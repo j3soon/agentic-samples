@@ -57,7 +57,7 @@ after six months.
 Get your team's pre-created RAP API key from your mentor in your team Slack
 channel. Ask your agent:
 
-> Configure RAP with Kimi-K3 for OpenCode, then test image reading.
+> Configure RAP with Kimi-K3 for OpenCode, preserving existing settings and permissions, then test image reading.
 
 Continue with **RAP + Kimi-K3** for the remaining setup. Use RAP freely during
 the hackathon. The event quota is intended to be effectively unlimited for normal

@@ -29,6 +29,9 @@
   Document only YOLO launch commands. Briefly note that approvals slow the workflow.
 - When `/.dockerenv` exists, assume the container is safely isolated.
   Never change harness permission settings automatically.
+- Provider setup must preserve custom settings and explicit deny rules.
+  Use a controlled merge, or leave custom files unchanged for the agent to
+  merge. A backup alone does not preserve active permissions.
 - Treat Nano4 as non-sensitive. Ask returning users to back up existing files
   before initial agent setup. New users can skip this step.
 - Run persistent cluster agents in Slurm allocations, not on login nodes.

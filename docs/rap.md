@@ -9,7 +9,7 @@ in your team Slack channel. See [credential setup](nchc-iservice.md#2-rap-api-ke
 
 Ask your agent:
 
-> Configure RAP with Kimi-K3 for OpenCode, then test image reading.
+> Configure RAP with Kimi-K3 for OpenCode, preserving existing settings and permissions, then test image reading.
 
 You may give the rotatable RAP API key to the agent, or enter it through your
 client's local prompt. RAP does not require a Nano4 SSH connection.
@@ -58,6 +58,11 @@ repository root, with the client installed in the same environment:
 bash scripts/rap/configure-opencode.sh
 ```
 
+If a custom configuration already exists, the script leaves it unchanged and
+stops. Ask your agent:
+
+> Merge the RAP provider and model fields from scripts/rap/configure-opencode.sh into my existing OpenCode config. Preserve other providers, settings, comments, and permissions. Do not change permission rules.
+
 For Pi instead:
 
 ```bash
@@ -70,13 +75,17 @@ Reuse existing authentication when available.
 ## What the scripts change
 
 The scripts use visible `cat` commands to write JSON, making RAP + Kimi-K3 the
-default. They overwrite model/settings files and back up existing files with
-private permissions. Other settings and providers in those files are replaced.
-Credential stores are left intact.
+default. Credential stores are left intact.
 
-The scripts always back up existing configuration and write without prompting.
-Each script prints its backup paths. Restore a previous configuration by copying
-its backup over the corresponding config file:
+OpenCode setup creates a private config if none exists. Repeating setup with
+the same generated config leaves it unchanged. It stops on a custom JSON or
+JSONC config so an agent can merge the RAP fields without losing other settings
+or changing permission rules. No JSONC parser or extra dependency is needed.
+
+Pi setup replaces `models.json` and `settings.json`, backing up existing files
+with private permissions first. Other settings and providers in those files are
+replaced. The script prints its backup paths. Restore a previous configuration
+by copying its backup over the corresponding config file:
 
 ```bash
 cp "YOUR_BACKUP_FILE" "YOUR_CONFIG_FILE"
@@ -94,10 +103,17 @@ it can read an image.
 
 ## Test image reading
 
-After configuring the provider and entering your key, run the matching test:
+After configuring the provider and entering your key, run the test for your client.
+
+**OpenCode:**
 
 ```bash
 bash scripts/rap/test-opencode.sh
+```
+
+**Pi instead:**
+
+```bash
 bash scripts/rap/test-pi.sh
 ```
 

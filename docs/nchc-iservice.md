@@ -52,7 +52,7 @@ ask [#cluster-support](https://nchcopenhackathon2026.slack.com/archives/C0C749A0
 
 You may give the RAP API key to the agent. It stores the key in the client's
 private auth file with mode `600`, preserving other credentials. This is separate
-from the model/settings files that the setup scripts overwrite.
+from the model/settings files that the setup scripts configure.
 
 For manual entry, use your client's local prompt after configuring the provider:
 
