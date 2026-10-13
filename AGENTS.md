@@ -26,6 +26,8 @@
 - Centralize credentials in `docs/nchc-iservice.md`. Keep machine passwords and
   OTPs out of chat. RAP keys may be given to the agent. Keep credentials out of
   Git and logs, store them privately, and reuse existing authentication.
+  Check stored authentication with client commands, and verify access with a
+  response test. Never display credential stores in file or shell tool output.
 - Match configuration names to the service GUI. Check model availability there
   and validate the documented workflow before claiming it works.
 - Test documented commands. Keep detailed validation notes in ignored

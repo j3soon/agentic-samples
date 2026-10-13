@@ -63,6 +63,8 @@ For manual entry, use your client's local prompt after configuring the provider:
   Enter your key. Pi stores it in `~/.pi/agent/auth.json`.
 
 If the client is already authenticated, skip entry and run the response test.
+Check stored authentication with client commands, and verify access with a
+response test. Keep credential file contents out of chat and tool output.
 The Nano4 `secrets/.env` contains only the Supercomputer account and Project
 system code. Keep passwords and OTP codes out of files, and API keys in the
 client's private credential store.
