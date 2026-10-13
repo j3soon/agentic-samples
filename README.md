@@ -524,7 +524,7 @@ and SSH. Stopping the container closes its SSH connection.
 
 Ask:
 
-> Run the provided PyTorch scaling experiment.
+> Run the initial PyTorch scaling sweep.
 
 **Look for:** four completed jobs, downloaded logs and verified checkpoints,
 and a weak scaling plot. Submit the GPU configurations independently so Slurm

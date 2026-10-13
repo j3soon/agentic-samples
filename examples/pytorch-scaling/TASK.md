@@ -13,7 +13,8 @@ limit for startup and cleanup. Timing excludes startup, warmup,
 and checkpoints and uses the slowest worker. Download logs, metrics, and model
 checkpoints. Check finite losses and verified reloads, then plot training time
 and weak scaling efficiency.
-Preserve this baseline and report it before making changes.
+Preserve this baseline, report it, and end the turn. Wait for the user's
+optimization request before changing allocations or running another sweep.
 
 When asked why scaling is poor, inspect the allocation records and logs.
 Fix the resource bottleneck and rerun all four configurations, keeping the

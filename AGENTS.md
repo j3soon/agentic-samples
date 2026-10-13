@@ -38,6 +38,7 @@
   State what each check proves and its limits.
 - For a request to run or optimize the PyTorch scaling experiment, read
   `examples/pytorch-scaling/TASK.md`, including again at the optimization step.
+  Run only the initial sweep until the user explicitly asks to optimize.
   Use the reference directory only when the user explicitly requests the
   recorded example or a comparison with it.
 
