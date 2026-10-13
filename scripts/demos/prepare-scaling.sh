@@ -44,7 +44,8 @@ if [[ -f "$repo_dir/artifacts/nano4-node-issues.md" ]]; then
 fi
 
 # The reference discussion is omitted from the copied walkthrough and Nano4 guide.
-sed '/^### Reference experiment/,$d' "$repo_dir/README.md" > "$workspace/README.md"
+sed -e '/^For workshops, an \[optional clean workspace\]/,+1d' \
+  -e '/^### Reference experiment/,$d' "$repo_dir/README.md" > "$workspace/README.md"
 sed '/^The optional \[PyTorch scaling guide\]/,+1d' "$repo_dir/docs/nano4.md" > "$workspace/docs/nano4.md"
 
 # These identifiers are safe to reuse. Passwords and OTPs are never stored here.

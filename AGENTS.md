@@ -39,8 +39,9 @@
 - For a request to run or optimize the PyTorch scaling experiment, read
   `examples/pytorch-scaling/TASK.md`, including again at the optimization step.
   Run only the initial sweep until the user explicitly asks to optimize.
-  Use the reference directory only when the user explicitly requests the
-  recorded example or a comparison with it.
+  Use the initial trainer and plotting tools identified in the task brief.
+  Read the optimized reference or recorded results only when the user explicitly
+  requests the recorded example or a comparison with it.
 
 ## Agent Environments
 

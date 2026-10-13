@@ -503,26 +503,8 @@ responses take additional time.
 ### Demo: run, explain, and rerun
 
 Start with the provided implementation, which reproduces a CPU allocation
-issue encountered in an earlier experiment. The [preparation script](scripts/demos/prepare-scaling.sh)
-copies the initial version and tools into a fresh workspace, excluding the
-optimized version, reference results, and Git history. Ask your current agent:
-
-> Prepare a clean scaling demo in ~/nchc-scaling-demo, reusing the SIF from step 3.
-
-Exit the agent. If using Docker, stop and remove its container as in step 2
-to change mounts. In your host terminal, select the workspace and a fresh
-private home, then use step 2's Docker launch command:
-
-```bash
-cd ~/nchc-scaling-demo
-export OPENCODE_PRIVATE_HOME="$HOME/docker/opencode-scaling"
-```
-
-Connect **RAP + Kimi-K3** using step 1 and authenticate Nano4 using step 3 in
-this container. Return with step 2's `docker exec` command to reuse settings
-and SSH. Stopping the container closes its SSH connection.
-
-Ask:
+issue encountered in an earlier experiment. Continue in your current agent
+session and reuse the SIF from step 3. Ask:
 
 > Run the initial PyTorch scaling sweep.
 
@@ -540,6 +522,9 @@ CPUs, and a comparison of timings and losses. The agent reports remaining
 jobs and updates the tracked [node exclusions](cluster/nano4/excluded-nodes.txt)
 when it encounters node failures. If SSH disconnects, repeat step 3's login
 handoff and tell the agent to resume.
+
+For workshops, an [optional clean workspace](docs/pytorch-scaling.md#optional-clean-workspace)
+omits the optimized version and recorded results.
 
 ### Reference experiment
 

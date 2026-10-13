@@ -25,6 +25,32 @@ The two-minute Slurm limit allows startup and checkpoint work. Queue time
 and local downloads are separate. This short demo shows an observable
 performance difference, not a rigorous benchmark.
 
+## Optional clean workspace
+
+The README demo works in the current repository and agent session. For a
+workshop, the [preparation script](../scripts/demos/prepare-scaling.sh) copies
+the initial version and tools without the optimized version, recorded results,
+or Git history. Ask your agent:
+
+> Prepare a clean scaling demo in ~/nchc-scaling-demo, reusing the SIF from step 3.
+
+A fresh agent session also avoids carrying earlier answers in its conversation.
+The copy does not prevent access to other repositories or remote files.
+
+To use the copy in Docker, exit the agent, then stop and remove its container
+as described in [README step 2](../README.md#2-give-the-agent-a-suitable-environment).
+In your host terminal, choose the workspace and an optional fresh private home:
+
+```bash
+cd ~/nchc-scaling-demo
+export OPENCODE_PRIVATE_HOME="$HOME/docker/opencode-scaling"
+```
+
+Use step 2's launch block to mount these paths. A fresh private home needs
+RAP setup from step 1 and Nano4 login from step 3. Reusing an existing private
+home preserves its settings, credentials, and sessions. Stopping the container
+closes its SSH connection, so reconnect Nano4 before running the demo.
+
 ## Run either sweep manually
 
 Reuse the SIF from step 3. Replace the account and run placeholders below.
