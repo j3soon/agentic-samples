@@ -734,3 +734,22 @@ want more detail or manual alternatives:
   versions, manual commands, and CPU allocation comparisons.
 - [ResNet inference](docs/resnet-inference.md): manual Nano4 commands and
   profiling guidance.
+
+## Your role
+
+Agents are getting better at doing the work, but you're still responsible for
+the result. You don't need to understand every line, but you should be able to
+explain how the pieces fit together, what the important parts do, and where a
+speedup comes from. Check their explanations against the code, tests, and
+measurements.
+
+Agents can still make mistakes or take
+[costly detours](https://www.anthropic.com/engineering/building-effective-agents).
+Your experience helps you set priorities, spot wrong turns, and keep time and
+cost under control. Give the agent room to work out the details and challenge
+your assumptions.
+
+After a big change, ask what changed, why, how it was checked, and what's still
+uncertain. Keep [asking questions and working through explanations](https://www.anthropic.com/research/AI-assistance-coding-skills)
+until you can explain it in your own words. Use each task as a chance to learn
+more about how your code works.
