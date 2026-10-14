@@ -521,7 +521,7 @@ issue encountered in an earlier experiment. Continue in your current agent
 session and reuse the SIF from step 3. Ask:
 
 > ```text
-> Run the initial PyTorch scaling sweep.
+> Run examples/pytorch-scaling/reference/initial/train.py on Nano4 with 1, 8, 16, and 32 GPUs for a weak-scaling test. Keep the provided resource defaults.
 > ```
 
 **Look for:** four completed jobs, downloaded logs and verified checkpoints,
