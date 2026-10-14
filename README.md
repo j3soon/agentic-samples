@@ -115,7 +115,9 @@ opencode --auto
 
 Use an available free model, selecting one with `/models` if needed. Ask:
 
+> ```text
 > Clone https://github.com/j3soon/agentic-samples.git into `.`. Check Git, OpenSSH, and rsync 3+, installing missing tools.
+> ```
 
 Enter any administrator password only in your own terminal.
 
@@ -129,7 +131,9 @@ Follow this handoff in your chosen host, VM, or Docker session.
 Your mentor shares your team's pre-created RAP API key in your team Slack
 channel. Ask:
 
+> ```text
 > Set up OpenCode with RAP + Kimi-K3 and test image reading.
+> ```
 
 The agent can configure the provider before you have entered its key, but the
 image test needs authentication. When it asks for the key, enter it locally
@@ -146,7 +150,9 @@ Exit with `/exit` and restart in the same environment to refresh provider settin
 
 Select `nchc-rap/Kimi-K3` with `/models`. In the RAP session, ask:
 
+> ```text
 > RAP is connected. Test image reading.
+> ```
 
 Continue with **RAP + Kimi-K3** for event work.
 Each team starts with a **NT$20,000 RAP budget**. If you exceed it or need more,
@@ -217,7 +223,9 @@ on your machine first. You do not need Docker inside the agent container.
 
 If you already have an agent and a clone, ask:
 
+> ```text
 > Build the OpenCode Docker image and show me the README launch command.
+> ```
 
 If you are starting with Docker and have no clone or agent yet, run this in
 your host terminal instead:
@@ -308,7 +316,9 @@ or give the rotatable key to the agent to store privately. Reuse existing
 authentication if available. The configuration selects RAP + Kimi-K3 by default.
 Ask:
 
+> ```text
 > Test RAP image reading in Pi.
+> ```
 
 Continue to Nano4 below from this Pi session. Exit Pi and its shell when done.
 To update, rerun the build and launch commands with the same mounts.
@@ -370,7 +380,9 @@ and enable more parallel build work. Nano4 lists compilation and building among
 
 Ask your agent:
 
+> ```text
 > Package my workload as a SIF for Nano4. Keep its build recipe.
+> ```
 
 **Do not run agents on Nano4 login (head) nodes.** These nodes are for short
 setup, file operations, and job management.
@@ -420,7 +432,9 @@ New users can skip this backup step.
 
 In your chosen agent session, ask:
 
+> ```text
 > Run the Nano4 single-GPU access check and download its logs.
+> ```
 
 The agent checks local tools, configures your account identifiers, prepares the
 image on allocated compute resources, submits the job, and collects results.
@@ -446,7 +460,9 @@ Keep them out of chat. A successful login reports `Master running (pid=...)`.
 
 After login succeeds, tell the agent:
 
+> ```text
 > Nano4 is connected. Resume the GPU check.
+> ```
 
 The agent reuses that SSH connection. A login on your host cannot automatically
 authenticate an agent inside a separate container or VM.
@@ -463,11 +479,15 @@ accounting before retrying. This avoids accidentally submitting twice.
 
 Ask your agent:
 
+> ```text
 > Check Nano4 job JOB_ID and download its logs.
+> ```
 
 To stop an unwanted job, replace `JOB_ID` with its numeric ID and ask:
 
+> ```text
 > Cancel Nano4 job JOB_ID and check the remaining jobs.
+> ```
 
 You can also cancel it directly in the same environment, from the repository:
 
@@ -506,7 +526,9 @@ Start with the provided implementation, which reproduces a CPU allocation
 issue encountered in an earlier experiment. Continue in your current agent
 session and reuse the SIF from step 3. Ask:
 
+> ```text
 > Run the initial PyTorch scaling sweep.
+> ```
 
 **Look for:** four completed jobs, downloaded logs and verified checkpoints,
 and a weak scaling plot. Submit the GPU configurations independently so Slurm
@@ -515,7 +537,9 @@ the workload fixed and asks the agent to preserve the baseline.
 
 Then ask:
 
+> ```text
 > Why is scaling bad? Fix it and rerun.
+> ```
 
 **Look for:** an explanation of the CPU bottleneck, a second sweep with more
 CPUs, and a comparison of timings and losses. The agent reports remaining
@@ -552,7 +576,9 @@ and the measured timings.
 
 If you want to understand the underlying commands, ask your agent directly:
 
+> ```text
 > Explain the commands you used and where to find them.
+> ```
 
 The walkthrough above is sufficient for getting started. Read these when you
 want more detail or manual alternatives:

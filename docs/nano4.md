@@ -49,7 +49,9 @@ the local agent prepare containers and submit workloads remotely.
 
 Start a local agent session in this repository and ask:
 
+> ```text
 > Run the Nano4 single-node GPU access check on one H200 GPU with cluster/nano4/smoke.slurm and download the logs.
+> ```
 
 Skills are stored in `skills/` and linked from `.agents/skills` and
 `.claude/skills` for automatic discovery. You do not need to name a skill in

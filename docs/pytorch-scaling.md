@@ -32,7 +32,9 @@ workshop, the [preparation script](../scripts/demos/prepare-scaling.sh) copies
 the initial version and tools without the optimized version, recorded results,
 or Git history. Ask your agent:
 
+> ```text
 > Prepare a clean scaling demo in ~/nchc-scaling-demo, reusing the SIF from step 3.
+> ```
 
 A fresh agent session also avoids carrying earlier answers in its conversation.
 The copy does not prevent access to other repositories or remote files.

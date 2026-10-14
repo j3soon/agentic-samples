@@ -12,7 +12,9 @@ in your team Slack channel. See [credential setup](nchc-iservice.md#2-rap-api-ke
 
 Ask your agent:
 
+> ```text
 > Configure RAP with Kimi-K3 for OpenCode, preserving existing settings and permissions, then test image reading.
+> ```
 
 You may give the rotatable RAP API key to the agent, or enter it through your
 client's local prompt. RAP does not require a Nano4 SSH connection.
@@ -65,7 +67,9 @@ bash scripts/rap/configure-opencode.sh
 If a custom configuration already exists, the script leaves it unchanged and
 stops. Ask your agent:
 
+> ```text
 > Merge the RAP provider and model fields from scripts/rap/configure-opencode.sh into my existing OpenCode config. Preserve other providers, settings, comments, and permissions. Do not change permission rules.
+> ```
 
 For Pi instead:
 
