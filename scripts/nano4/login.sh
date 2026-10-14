@@ -21,6 +21,8 @@ if [[ ! -t 0 || ! -t 1 ]]; then
   echo 'Authentication requires your terminal. Run: bash scripts/nano4/login.sh' >&2
   exit 10
 fi
-ssh "${ssh_options[@]}" -o ControlMaster=yes -o ControlPersist=yes -Nf "$target"
+# Probe idle connections every 30 seconds. Allow five minutes of missed replies.
+ssh "${ssh_options[@]}" -o ControlMaster=yes -o ControlPersist=yes \
+  -o ServerAliveInterval=30 -o ServerAliveCountMax=10 -Nf "$target"
 check_master
 ssh "${ssh_options[@]}" -o BatchMode=yes "$target" true

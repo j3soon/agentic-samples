@@ -109,6 +109,11 @@ The configuration script creates the ignored `secrets/.env` with only the
 Supercomputer account and Project system code. Login manages SSH connection
 sharing without changing `~/.ssh/config`.
 Subsequent commands reuse the connection with no local idle expiration.
+The master sends SSH keepalive probes after 30 seconds without incoming traffic
+and tolerates ten unanswered probes (about five minutes). This can help with
+idle network connections, but does not override server-enforced disconnects
+or preserve a connection through shutdown. These options apply to newly
+created masters. An already running master keeps its original options.
 Run `logout.sh` to close it. Shutdown closes it, and sleep or network changes
 may break it. Run `login.sh` again when needed.
 Nano4 may disconnect it earlier. Already submitted Slurm jobs continue running.
