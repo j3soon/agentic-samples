@@ -13,12 +13,13 @@ Give them a clear assignment, a suitable workspace, and a way to check their
 work. For optimization, that means a baseline, a correctness test, and a
 performance target. Your team's NVIDIA mentor can help with domain questions.
 
-This guide follows four stages, each with a short demonstration:
+This guide follows five stages, each with a short demonstration:
 
 1. [Understand the agent and model provider](#1-understand-the-agent-and-model-provider).
 2. [Give the agent a suitable environment](#2-give-the-agent-a-suitable-environment).
 3. [Check single-node GPU access on Nano4](#3-check-single-node-gpu-access-on-nano4).
 4. [Run multi-node workloads on Nano4](#4-run-multi-node-workloads-on-nano4).
+5. [Use NVIDIA skills for optimization](#5-use-nvidia-skills-for-optimization).
 
 Follow this README for the complete workflow. If your Nano4 account is not set
 up, also read [NCHC iService setup](docs/nchc-iservice.md). Other Markdown files
@@ -566,6 +567,68 @@ These measurements illustrate the example. Results depend on placement and load.
 The optional [reference guide](docs/pytorch-scaling.md) gives manual commands
 and the measured timings.
 
+## 5. Use NVIDIA skills for optimization
+
+**Skills** give an agent product-specific instructions, references, and tools.
+This resnet-inference example demonstrates an optimization loop followed by
+an NVIDIA Nsight Systems skill review that makes the result easier to assess.
+
+Start with [minimal ResNet-152 inference](examples/resnet-inference/01_base.py)
+on 10,000 ImageNetV2 images, using pretrained weights, FP32, and batch size 1.
+Continue in your current agent session and reuse the PyTorch SIF from step 3.
+Keep the agent local. Run preparation, inference, and profiling on Nano4
+compute nodes through Slurm. No local GPU is needed.
+
+### Demo: measure, optimize, and review
+
+First ask:
+
+> ```text
+> Run examples/resnet-inference/01_base.py on Nano4.
+> ```
+
+The [Slurm script](examples/resnet-inference/baseline.slurm) requests one H200
+and 12 CPUs. The [workload script](examples/resnet-inference/run-baseline.sh)
+prepares dependencies and downloads the inputs on the compute node.
+
+**Look for:** a completed job, downloaded logs, images per second, top-1/top-5
+accuracy, and an environment record. The original timer skips the first image.
+The [task brief](examples/resnet-inference/TASK.md) requires matching timing
+boundaries before comparing versions.
+
+Then ask:
+
+> ```text
+> Optimize this code, run it on Nano4, inspect the results, and repeat until no worthwhile improvements remain.
+> ```
+
+The agent chooses libraries and tools from measurements and can discover skills
+along the way. It records each attempt in `artifacts/resnet-inference/journal.md`,
+including failed trials and keep-or-revert decisions. The task brief preserves
+correctness and resources and sets a bounded experiment budget.
+
+**Look for:** repeated measured experiments, a baseline-to-best comparison,
+prediction-agreement checks, and a journal updated after every attempt. Treat
+2× as a milestone and continue while worthwhile gains remain. Logs, source
+snapshots, and reports belong under ignored `artifacts/resnet-inference/`.
+
+Finally ask:
+
+> ```text
+> Use the Nsight Systems skill to explain the baseline and optimized execution for human review.
+> ```
+
+The agent follows the bundled skill's setup and analysis workflow and writes
+`artifacts/resnet-inference/review.md`. It links evidence for retained changes,
+explains failures and remaining opportunities, and gives reproduction commands.
+Benchmark timings exclude profiling overhead.
+
+**Look for:** matching baseline and optimized `.nsys-rep` files, visual timelines,
+capture-health checks, and explanations tied to NVTX ranges, CUDA calls,
+transfers, and GPU execution. Review correctness and added complexity alongside
+the measured gain. Ask your NVIDIA mentor to review the evidence for your workload.
+The optional [resnet-inference guide](docs/resnet-inference.md) gives manual commands.
+
 ## Optional supplementary material
 
 If you want to understand the underlying commands, ask your agent directly:
@@ -598,3 +661,5 @@ want more detail or manual alternatives:
 - [Nano4](docs/nano4.md): manual Slurm commands, resource choices, and recovery.
 - [PyTorch scaling reference](docs/pytorch-scaling.md): initial and optimized
   versions, manual commands, and CPU allocation comparisons.
+- [ResNet inference](docs/resnet-inference.md): manual Nano4 commands and
+  profiling guidance.

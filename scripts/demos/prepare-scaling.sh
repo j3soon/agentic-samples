@@ -46,6 +46,8 @@ fi
 # Point the copied walkthrough at its trainer and omit reference discussion.
 sed -e 's|examples/pytorch-scaling/reference/initial/|examples/pytorch-scaling/|g' \
   -e '/^For workshops, an \[optional clean workspace\]/,+1d' \
+  -e '/^5\. \[/d' \
+  -e 's/This guide follows five stages/This guide follows four stages/' \
   -e '/^### Reference experiment/,$d' "$repo_dir/README.md" > "$workspace/README.md"
 sed '/^The optional \[PyTorch scaling guide\]/,+1d' "$repo_dir/docs/nano4.md" > "$workspace/docs/nano4.md"
 

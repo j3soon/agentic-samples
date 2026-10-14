@@ -1,0 +1,3 @@
+# PyTorch and torchvision come from the PyTorch SIF.
+nvtx==0.2.16
+imagenetv2-pytorch @ git+https://github.com/modestyachts/ImageNetV2_pytorch@14d4456c39fe7f02a665544dd9fc37c1a5f8b635

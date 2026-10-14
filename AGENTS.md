@@ -42,6 +42,9 @@
   Use the initial trainer and plotting tools identified in the task brief.
   Read the optimized reference or recorded results only when the user explicitly
   requests the recorded example or a comparison with it.
+- For the resnet-inference example, read `examples/resnet-inference/TASK.md`
+  before running, optimizing, or profiling it. Run workloads only on Nano4
+  through Slurm and keep evidence under ignored `artifacts/`.
 
 ## Agent Environments
 
