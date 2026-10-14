@@ -629,6 +629,47 @@ transfers, and GPU execution. Review correctness and added complexity alongside
 the measured gain. Ask your NVIDIA mentor to review the evidence for your workload.
 The optional [resnet-inference guide](docs/resnet-inference.md) gives manual commands.
 
+### Recorded resnet-inference example
+
+The agent discovered TensorRT's ONNX quickstart and DALI's dynamic-mode skills
+during optimization. They guided engine validation and GPU preprocessing.
+The Nsight Systems skill then checked the captures and reviewed the result.
+
+On one H200 with 12 CPUs, the paired full-dataset measurements reached
+**52.7× throughput**, with **99.05% prediction agreement** and **66.99%/87.22%
+top-1/top-5 accuracy**. The bars show medians and ranges of three unprofiled runs:
+
+![ResNet inference throughput across baseline, batched PyTorch, TensorRT, and DALI stages](docs/assets/resnet-inference-throughput.png)
+
+The intermediate stages used other allocations with the same one-H200 and
+12-CPU requests. Their differences also include placement and load variation.
+
+The Nsight comparison uses **31 ms windows** from matching 256-image captures.
+The baseline processes one image per batch, while TensorRT runs batches of 128
+in FP16. GPU rows show recorded execution. Host NVTX ranges include waiting:
+
+![Baseline and optimized execution in equal-duration windows](docs/assets/resnet-inference-timeline.png)
+
+Batching and TensorRT reduce repeated launch work. Across the full captures,
+GPU kernels fall from **170,240 to 748**. Deferring accuracy readback reduces
+GPU-to-CPU copies from **512 to two**. DALI's GPU preprocessing appears in orange
+before the blue main GPU execution.
+
+The marked region separates four JPEG preprocessing streams. Around
+**70 microseconds**, two orange kernels overlap a purple host-to-device copy:
+
+![Concurrent JPEG kernels and a copy on separate CUDA streams](docs/assets/resnet-inference-overlap.png)
+
+The skill's `cuda_gpu_time_util_map` recipe corroborated kernel concurrency.
+The optimized crop uses the second batch, after observed library loads. This
+two-batch capture shows brief preprocessing overlap. It cannot establish
+sustained pipeline overlap or measure hardware SM utilization.
+
+The final code is [dali.py](examples/resnet-inference/reference/dali.py).
+The optional [recorded guide](docs/resnet-inference.md#recorded-example) gives
+reproduction commands, measurements, skill sources, and limitations.
+Results depend on hardware, load, and the accuracy contract.
+
 ## Appendix: NVIDIA skills
 
 NVIDIA publishes skills for its tools and CUDA-X libraries. Some are bundled

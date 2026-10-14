@@ -1,0 +1,188 @@
+{
+  "model": "torchvision ResNet-152 IMAGENET1K_V1",
+  "dataset": "ImageNetV2 matched-frequency",
+  "environment": {
+    "gpu": "NVIDIA H200",
+    "gpus": 1,
+    "cpus": 12,
+    "memory_gb": 32,
+    "image": "nvcr.io/nvidia/pytorch:26.09-py3",
+    "torch": "2.14.0a0+b2c75dd062.nv26.09",
+    "tensorrt": "11.3.0.99",
+    "dali": "2.3.0",
+    "nsight_systems": "2026.5.1.161"
+  },
+  "timing": "All 10000 images, first fetch through synchronized accuracy. Downloads, loading, builds and warmup excluded. Separate prediction and preprocessing diagnostic runs.",
+  "cache_policy": "Same input directory and a warm filesystem cache. No whole-dataset predecode.",
+  "comparison": "Baseline and final measured together in job 539335 on 25a-hgpn002. Intermediate stages used other allocations with the same requested resources, so placement and load can affect differences.",
+  "memory_note": "PyTorch allocator peak excludes private TensorRT and DALI allocations. CUDA used at end includes runtime allocations and is not a peak.",
+  "variants": [
+    {
+      "name": "baseline",
+      "label": "Baseline",
+      "plot_label": "Baseline\nFP32, batch 1",
+      "job": 539335,
+      "source": "measure.py",
+      "settings": {
+        "batch_size": 1,
+        "workers": 0,
+        "precision": "fp32"
+      },
+      "images": 10000,
+      "elapsed_seconds": [
+        130.41044715300086,
+        133.08333018698613,
+        130.91713548000553
+      ],
+      "images_per_second": [
+        76.68097317592773,
+        75.14089094366436,
+        76.38419495916378
+      ],
+      "median_images_per_second": 76.38419495916378,
+      "top1_percent": 66.98,
+      "top5_percent": 87.22,
+      "matching_top1_predictions": 10000,
+      "agreement_percent": 100.0,
+      "cuda_used_bytes_at_end": 1049427968,
+      "speedup": 1.0
+    },
+    {
+      "name": "pytorch",
+      "label": "PyTorch FP16",
+      "plot_label": "Batched PyTorch\nFP16 + loader",
+      "job": 539150,
+      "source": "measure.py",
+      "settings": {
+        "batch_size": 128,
+        "workers": 8,
+        "precision": "fp16",
+        "channels_last": true,
+        "defer_accuracy": true
+      },
+      "images": 10000,
+      "elapsed_seconds": [
+        6.653204247821122,
+        6.6911429218016565,
+        6.703146851155907
+      ],
+      "images_per_second": [
+        1503.0351733564967,
+        1494.51298782113,
+        1491.836628683672
+      ],
+      "median_images_per_second": 1494.51298782113,
+      "top1_percent": 66.94,
+      "top5_percent": 87.21,
+      "matching_top1_predictions": 9986,
+      "agreement_percent": 99.86,
+      "cuda_used_bytes_at_end": 1944911872,
+      "speedup": 19.565735930320674
+    },
+    {
+      "name": "ring",
+      "label": "TensorRT + CPU ring",
+      "plot_label": "TensorRT\nCPU decode",
+      "job": 539150,
+      "settings": {
+        "batch_size": 256,
+        "workers": 11,
+        "precision": "fp16",
+        "chunk": 16,
+        "slots": 4
+      },
+      "images": 10000,
+      "elapsed_seconds": [
+        3.7124219150282443,
+        3.6995283979922533,
+        3.691037076059729
+      ],
+      "images_per_second": [
+        2693.659349310225,
+        2703.047233108694,
+        2709.265660012075
+      ],
+      "median_images_per_second": 2703.047233108694,
+      "top1_percent": 66.98,
+      "top5_percent": 87.22,
+      "matching_top1_predictions": 9960,
+      "agreement_percent": 99.6,
+      "cuda_used_bytes_at_end": 2274164736,
+      "speedup": 35.3875200825745,
+      "archived_source": "optimized.py"
+    },
+    {
+      "name": "optimized",
+      "label": "TensorRT + DALI",
+      "plot_label": "TensorRT + DALI\nGPU preprocessing",
+      "job": 539335,
+      "source": "dali.py",
+      "settings": {
+        "batch_size": 128,
+        "threads": 11,
+        "torch_cpu_threads": 1,
+        "precision": "fp16",
+        "warmup_input": true,
+        "huffman_threshold": 1000000
+      },
+      "images": 10000,
+      "elapsed_seconds": [
+        2.4219380769936834,
+        2.4853129609837197,
+        2.5053820140019525
+      ],
+      "images_per_second": [
+        4128.92472148291,
+        4023.6381320933797,
+        3991.4072760610975
+      ],
+      "median_images_per_second": 4023.6381320933797,
+      "top1_percent": 66.99,
+      "top5_percent": 87.22,
+      "matching_top1_predictions": 9905,
+      "agreement_percent": 99.05,
+      "cuda_used_bytes_at_end": 2987130880,
+      "speedup": 52.67631784617854
+    }
+  ],
+  "optimized_setup_seconds": [
+    5.1908629889949225,
+    5.154563107993454,
+    5.284816814004444
+  ],
+  "build_seconds": {
+    "export": 10.51,
+    "engine": 138.73
+  },
+  "preprocessing_check": {
+    "job": 539275,
+    "images": 200,
+    "max_normalized_pixel_difference": 0.052755117416381836
+  },
+  "rap_validation": {
+    "harness": "OpenCode 1.19.0",
+    "provider": "nchc-rap",
+    "model": "Kimi-K3",
+    "workspace": "Fresh private home and baseline workspace, without recorded solution or Git history.",
+    "baseline_job": 539221,
+    "optimized_job": 539311,
+    "baseline_images_per_second": [
+      75.41,
+      79.24,
+      78.03
+    ],
+    "optimized_images_per_second": [
+      1841.52,
+      1823.1,
+      1831.84
+    ],
+    "median_speedup": 23.47609893630655,
+    "settings": "PyTorch BF16, batch 128, channels-last, 11 loader workers, pinned memory, GPU accuracy accumulation.",
+    "correctness_job": 540569,
+    "agreeing_top1_predictions": 9912,
+    "images": 10000,
+    "top1_percent": 67.02,
+    "top5_percent": 87.23,
+    "limit": "Separate allocations with matching one-H200 and 12-CPU requests. This validates baseline and optimization, with Nsight review provided by the reference run."
+  }
+}

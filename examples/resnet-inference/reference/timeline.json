@@ -1,0 +1,69 @@
+{
+  "method": "Bounded native-report queries through the Nsight Systems skill gateway. CSV timestamps are nanoseconds in each report clock. No hardware utilization calculation.",
+  "profile_job": 539335,
+  "images_per_capture": 256,
+  "nsight_systems_version": "2026.5.1.161",
+  "cpu_sampling": false,
+  "cpu_scheduling": false,
+  "gpu_hardware_metrics": false,
+  "health": "GPU identity, runtime/kernel correlation, NVTX coverage, and timeline checks passed for both reports.",
+  "copy_kinds": {
+    "1": "host_to_device",
+    "2": "device_to_host"
+  },
+  "windows": [
+    {
+      "name": "baseline",
+      "report_label": "baseline-256.nsys-rep",
+      "batch_size": 1,
+      "benchmark_start_ns": 31962961,
+      "benchmark_end_ns": 5170757021,
+      "window_start_ns": 2031962961,
+      "window_end_ns": 2062962961,
+      "main_gpu_stream": 7,
+      "total_kernels": 170240,
+      "device_to_host_copies": 512
+    },
+    {
+      "name": "optimized",
+      "report_label": "optimized-256.nsys-rep",
+      "batch_size": 128,
+      "benchmark_start_ns": 30996739,
+      "benchmark_end_ns": 225700455,
+      "window_start_ns": 194700455,
+      "window_end_ns": 225700455,
+      "main_gpu_stream": 19,
+      "main_host_tid": 306838840480124,
+      "reader_nvtx_name": "[DALI][Loader] ReadOne",
+      "total_kernels": 748,
+      "device_to_host_copies": 2
+    }
+  ],
+  "parallelism_detail": {
+    "report_label": "optimized-256.nsys-rep",
+    "start_ns": 200300000,
+    "end_ns": 200440000,
+    "streams": [
+      159,
+      160,
+      164,
+      163
+    ]
+  },
+  "concurrency_evidence": {
+    "recipe": "cuda_gpu_time_util_map",
+    "options": [
+      "--mode",
+      "none",
+      "--bins",
+      "200",
+      "--disable-alignment"
+    ],
+    "comparison": "Repeat with --cumulative. Normal mode counts time with any kernel running. Cumulative mode sums kernel durations across streams and can exceed 100 percent. These are time percentages, not SM utilization.",
+    "query": "SELECT Duration, Kernel FROM analysis WHERE Duration = 199623329",
+    "optimized_bin_start_ns": 199623329,
+    "normal_kernel_time_percent": 2.7,
+    "cumulative_kernel_time_percent": 2.9,
+    "baseline_normal_equals_cumulative_in_all_200_bins": true
+  }
+}
