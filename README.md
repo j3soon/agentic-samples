@@ -378,12 +378,6 @@ we recommend a Slurm compute allocation to avoid login-node resource limits
 and enable more parallel build work. Nano4 lists compilation and building among
 [login-node functions](https://man.twcc.ai/@nano4-manual/BydP-_lvZg).
 
-Ask your agent:
-
-> ```text
-> Package my workload as a SIF for Nano4. Keep its build recipe.
-> ```
-
 **Do not run agents on Nano4 login (head) nodes.** These nodes are for short
 setup, file operations, and job management.
 
