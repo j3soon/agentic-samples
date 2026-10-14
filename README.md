@@ -629,6 +629,36 @@ transfers, and GPU execution. Review correctness and added complexity alongside
 the measured gain. Ask your NVIDIA mentor to review the evidence for your workload.
 The optional [resnet-inference guide](docs/resnet-inference.md) gives manual commands.
 
+## Appendix: NVIDIA skills
+
+NVIDIA publishes skills for its tools and CUDA-X libraries. Some are bundled
+with the product, such as Nsight Systems' analysis pack. Others live in product
+repositories. Availability and APIs depend on the installed version.
+
+| Skill | What it helps the agent do | Official source |
+|---|---|---|
+| `nsight-systems` | Capture CUDA/NVTX activity, check reports, and explain execution | [Bundled Nsight Systems pack](https://docs.nvidia.com/nsight-systems/AnalysisGuide/#ai-assisted-analysis) |
+| `trt-onnx-quickstart` | Build a TensorRT engine from ONNX and verify numerical agreement | [TensorRT repository](https://github.com/NVIDIA/TensorRT/tree/main/.agents/skills/trt-onnx-quickstart) |
+| `dali-dynamic-mode` | Develop GPU data preprocessing with DALI's imperative API | [DALI repository](https://github.com/NVIDIA/DALI/tree/main/skills/dali-dynamic-mode) |
+
+You do not always need to find and install skills yourself. An agent can discover
+their readable `SKILL.md` files while inspecting installed tools or exploring
+official documentation. Discovery depends on its tools and the available sources.
+Ask it to report which skills it actually read or followed. Ordinary documentation
+lookup alone does not establish skill use. Referenced scripts and dependencies
+must also be available when the pack requires them.
+
+[NVIDIA/skills](https://github.com/NVIDIA/skills) is a broader discovery catalog,
+including guidance across NVIDIA products and mirrored product skills.
+Ask your agent:
+
+> ```text
+> Find NVIDIA skills relevant to this workload.
+> ```
+
+You can point the agent directly at a skill directory. The corresponding library,
+profiler, and runtime still need to be prepared in the workload environment.
+
 ## Optional supplementary material
 
 If you want to understand the underlying commands, ask your agent directly:
