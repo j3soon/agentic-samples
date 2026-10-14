@@ -580,6 +580,21 @@ If you want to understand the underlying commands, ask your agent directly:
 > Explain the commands you used and where to find them.
 > ```
 
+To document the session:
+
+> ```text
+> Review our full conversation history and document the process as a standalone HTML report. Serve it and share the URL with me.
+> ```
+
+To check the work with independent reviewers:
+
+> ```text
+> Launch subagents for adversarial review. Verify their findings, fix worthwhile issues, and validate the changes.
+> ```
+
+Bun's [rewrite with Claude](https://bun.com/blog/bun-in-rust#adversarial-review)
+used separate contexts for implementation and adversarial review.
+
 The walkthrough above is sufficient for getting started. Read these when you
 want more detail or manual alternatives:
 
