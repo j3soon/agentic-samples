@@ -470,6 +470,52 @@ If SSH disconnects, run the login command again and ask the agent to resume
 the same run. If submission is uncertain, ask it to inspect the queue and
 accounting before retrying. This avoids accidentally submitting twice.
 
+#### Open an interactive shell (optional)
+
+`login.sh` keeps an authenticated SSH master running in the background.
+Using the same `ControlPath` opens another shell through that connection
+without repeating authentication. Run this from the repository root, as the
+same local OS user and in the same host, VM, or container used for login.
+Replace `YOUR_SUPERCOMPUTER_ACCOUNT` with your Nano4 username:
+
+```bash
+bash scripts/nano4/login.sh
+ssh -t -p 22 \
+  -o "ControlPath=$HOME/.ssh/nano4-control/%C" \
+  -o ControlMaster=no -o BatchMode=yes \
+  YOUR_SUPERCOMPUTER_ACCOUNT@nano4.nchc.org.tw \
+  env "NANO4_EXCLUDED_NODES=$(paste -sd, cluster/nano4/excluded-nodes.txt)" bash -l
+```
+
+`login.sh` reuses a working master or asks you to authenticate in this terminal.
+If SSH reports `Permission denied (keyboard-interactive)`, the master was not
+reused. Run `bash scripts/nano4/check.sh` in the same environment to check it,
+then rerun `login.sh` if needed. Enter passwords and approve phone requests
+only through your own terminal and phone.
+
+You are now on a **Nano4 login node**. The command carries the repository's
+current node exclusions into this shell. To open a **compute-node shell**,
+run the following there. It reserves one H200 GPU for up to ten minutes and
+uses compute credits. Replace `gov114072` if using another project's
+lowercase system code:
+
+```bash
+srun --account=gov114072 --partition=dev \
+  --nodes=1 --ntasks=1 --gpus-per-node=1 --cpus-per-task=1 \
+  --mem=2G --time=00:10:00 --chdir=/tmp --immediate=10 \
+  ${NANO4_EXCLUDED_NODES:+--exclude="$NANO4_EXCLUDED_NODES"} \
+  --pty bash -l
+```
+
+The conditional `--exclude` option avoids suspected nodes when the list is
+nonempty. If resources are unavailable, the command exits after its short
+allocation wait. Run `hostname` in either shell to confirm where you are.
+Use `exit` to leave the compute shell and release its allocation, then `exit`
+again to leave the login shell. The SSH master remains available.
+If it disconnects, rerun `login.sh` locally. To close the master deliberately,
+run `bash scripts/nano4/logout.sh` locally. See the
+[Nano4 guide](docs/nano4.md#interactive-shells) for connection details.
+
 #### Check or stop a job
 
 Ask your agent:

@@ -113,6 +113,36 @@ Run `logout.sh` to close it. Shutdown closes it, and sleep or network changes
 may break it. Run `login.sh` again when needed.
 Nano4 may disconnect it earlier. Already submitted Slurm jobs continue running.
 
+#### Interactive shells
+
+The [README interactive-shell commands](../README.md#open-an-interactive-shell-optional)
+open a login-node shell through the existing SSH master, then a compute-node
+shell through Slurm. Copy the commands there. Use the same local OS user and
+host, VM, or container as `login.sh`, so the client can reach its control socket.
+In Docker, open the matching container terminal using the README's `docker exec`
+handoff. Starting a shell on the host does not reuse a master inside a container.
+
+OpenSSH's `ControlPath` identifies the shared socket. `%C` hashes the local
+host, destination host, port, and remote username. Keep the destination and
+port consistent with `login.sh`. `-t` requests an interactive terminal, and
+`BatchMode=yes` disables authentication prompts if the connection is unavailable.
+See the [OpenSSH client options](https://man.openbsd.org/ssh) and
+[connection-sharing settings](https://man.openbsd.org/ssh_config#ControlMaster).
+
+The login command passes the local exclusion list into the remote shell.
+The compute command consumes it when requesting a short allocation. The login
+shell does not reserve GPUs. Exiting the compute shell releases its allocation,
+and exiting the login shell leaves the master running. Keep the container alive
+to reuse its connection, and use `logout.sh` to close the master explicitly.
+When the connection stops working, run `login.sh` in the original local
+environment, then retry the README command. A mounted private home preserves
+settings across container recreation, but not a live SSH connection.
+
+`Permission denied (keyboard-interactive)` with `BatchMode=yes` means a fresh
+authentication was rejected. Check the master with `check.sh` and authenticate
+with `login.sh` in the same environment. The README block runs `login.sh` first
+so it can reopen the connection before requesting an interactive shell.
+
 ### 3. Prepare a container and submit a job
 
 **Run these scripts locally. Apptainer itself runs only on Nano4, inside
