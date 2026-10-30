@@ -331,6 +331,33 @@ After cluster actions, end the turn with `bash scripts/nano4/exec.sh squeue --me
 and report all remaining running/pending jobs and unresolved suspected nodes.
 The evidence record can be shared with a cluster administrator by the user.
 
+## Storage quotas
+
+`hfsquota` on Nano4 lists the usage and hard limit of your `/home` and `/work`
+directories. Run it through the shared connection:
+
+```bash
+bash scripts/nano4/exec.sh hfsquota
+```
+
+`df -h /work/$USER` reports the same `/work` limit as the filesystem size.
+Nano4's [test-phase guide](https://man.twcc.ai/@nano4-manual/SyaY-6T8bg) lists
+100 GB each for `/home` and `/work` by default. These are hard limits. A write
+past the limit fails with `No space left on device`. Preparation copies the
+finished SIF to `/work` only after the build, so a full quota fails a paid
+preparation at its last step. Compare the free space with the expected SIF and
+result sizes before preparing a large image. After you delete files, the freed
+space can take about a minute to appear in `hfsquota` and `df`.
+
+If you need more storage, ask in
+[#cluster-support](https://nchcopenhackathon2026.slack.com/archives/C0C749A0NTE).
+Storage beyond the free quota is billed per GB per day by plan type, as listed
+in NCHC's [pricing guide](https://iservice.nchc.org.tw/nchc_service/nchc_service_qa.php?target=54).
+
+For administrators, the project's default per-user limits (`/home` and `/work`,
+100 GB each) are adjusted on the
+[HFS user quota page](https://hpc-hfs.nchc.org.tw/x86/user_quota/mgmt/GOV114072?platform=nano4&type=x86_user).
+
 ## Other images and resources
 
 These are alternatives to the single-node GPU check. Each new job needs a fresh

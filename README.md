@@ -408,6 +408,22 @@ At that rate, one GPU for one hour costs NT$60, and a full eight-GPU node costs
 **NT$480 per hour**. Estimate compute cost as allocated GPUs × running hours ×
 NT$60. Container preparation also uses a paid compute allocation.
 
+### Storage quotas
+
+Your `/home` and `/work` directories have hard size limits, 100 GB each by default
+in Nano4's [test-phase guide](https://man.twcc.ai/@nano4-manual/SyaY-6T8bg).
+A write past the limit fails with `No space left on device`. Large images and
+results can fill `/work` quickly. Check your usage and limits before preparing a
+large image:
+
+```bash
+bash scripts/nano4/exec.sh hfsquota
+```
+
+**If you need more storage, ask in
+[#cluster-support](https://nchcopenhackathon2026.slack.com/archives/C0C749A0NTE).**
+See [storage quotas](docs/nano4.md#storage-quotas) for details.
+
 ### Demo: check GPU access on one node with one GPU
 
 Run `nvidia-smi` inside a PyTorch container on one H200 GPU using

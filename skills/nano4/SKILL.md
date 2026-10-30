@@ -99,6 +99,13 @@ in the user's own terminal. Rsync reuses the authenticated SSH master.
   For definition-file builds, stage the recipe and its inputs in node-local
   scratch inside the Slurm task. Root-mapped builds may fail to read private
   `/work` paths. Login-node scratch is separate from compute-node scratch.
+- Before preparing a large image or writing large outputs, run `exec.sh hfsquota`
+  and compare the free `/work` space with the expected SIF and output sizes.
+  The quotas are hard limits, and preparation copies the SIF to `/work` only
+  after the paid build. Never delete the user's files to make room. If more
+  space is needed, ask the user to request it in #cluster-support.
+  Administrators change the project's default limits on the HFS quota page
+  linked in `docs/nano4.md#storage-quotas`.
 - Report the job ID. Use `status.sh` for explicit requests or bounded checks, not
   tight polling. Use `download.sh [RELATIVE_PATHS...]` to download logs and artifacts
   into ignored `results/<job-id>/`. Inspect exit codes and downloaded output
